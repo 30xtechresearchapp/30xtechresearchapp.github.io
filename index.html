@@ -1,70 +1,1340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iVolt Sovereign Dashboard</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { --glass: rgba(255, 255, 255, 0.1); --neon: #00f2ff; }
-        body { 
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
-            color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px;
-        }
-        .card {
-            background: var(--glass); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
-            padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
-        }
-        .stats { display: flex; justify-content: space-between; align-items: center; }
-        .neon-text { color: var(--neon); font-weight: bold; text-shadow: 0 0 10px var(--neon); }
-        .btn {
-            background: var(--neon); color: black; border: none; width: 100%;
-            padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>30xTech Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #09090b;
+    --surface:   #111114;
+    --card:      #16161a;
+    --border:    #232329;
+    --gold:      #c9a84c;
+    --gold-dim:  #7a6230;
+    --text:      #e8e8ec;
+    --muted:     #6b6b78;
+    --accent:    #1a1a20;
+    --green:     #2ecc71;
+    --red:       #e74c3c;
+    --radius:    16px;
+    --radius-sm: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ── Layout shell ─────────────────────────────── */
+  .shell {
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ── Screens ──────────────────────────────────── */
+  .screen {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    padding-bottom: 80px;
+    animation: fadeIn .25s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* ── Top bar ──────────────────────────────────── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: .3px;
+  }
+  .topbar-sub {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: -2px;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 500;
+    letter-spacing: .5px;
+  }
+  .live-dot::before {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; } 50% { opacity:.3; }
+  }
+
+  /* ── Bottom nav ───────────────────────────────── */
+  .nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px 14px;
+    cursor: pointer;
+    gap: 4px;
+    transition: color .15s;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    border: none;
+    background: none;
+  }
+  .nav-item.active { color: var(--gold); }
+  .nav-icon {
+    width: 22px; height: 22px;
+    stroke-width: 1.6;
+  }
+
+  /* ── Cards ────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 0 16px 12px;
+  }
+  .card-sm {
+    padding: 14px 16px;
+  }
+  .card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  /* ── Section header ───────────────────────────── */
+  .section-head {
+    padding: 20px 20px 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .section-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── Buttons ──────────────────────────────────── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    cursor: pointer;
+    border: none;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-gold {
+    background: linear-gradient(135deg, #c9a84c, #a07830);
+    color: #09090b;
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost {
+    background: var(--accent);
+    color: var(--text);
+  }
+
+  /* ── Input ────────────────────────────────────── */
+  .input-wrap {
+    margin-bottom: 14px;
+  }
+  .input-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .input {
+    width: 100%;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .input:focus { border-color: var(--gold-dim); }
+  .input::placeholder { color: var(--muted); }
+
+  /* ── Toggle ───────────────────────────────────── */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .toggle-row:first-child { padding-top: 0; }
+  .toggle-label { font-size: 14px; color: var(--text); }
+  .toggle-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .toggle {
+    position: relative;
+    width: 44px; height: 24px;
+    flex-shrink: 0;
+  }
+  .toggle input { display: none; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--gold); }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform .2s;
+    pointer-events: none;
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+  /* ── Segment control ──────────────────────────── */
+  .segment {
+    display: flex;
+    background: var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin-bottom: 16px;
+    gap: 3px;
+  }
+  .seg-btn {
+    flex: 1;
+    padding: 9px 8px;
+    border-radius: 8px;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: .4px;
+    transition: background .15s, color .15s;
+  }
+  .seg-btn.active {
+    background: var(--card);
+    color: var(--gold);
+  }
+
+  /* ── Signal card ──────────────────────────────── */
+  .signal-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 0 16px 10px;
+  }
+  .signal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .signal-symbol {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: var(--text);
+  }
+  .signal-dir {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .signal-dir.long { background: rgba(46,204,113,.12); color: var(--green); }
+  .signal-dir.short { background: rgba(231,76,60,.12); color: var(--red); }
+  .signal-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .signal-field-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .signal-field-val {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .signal-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Index confluence bar ─────────────────────── */
+  .idx-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .idx-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .idx-row:first-child { padding-top: 0; }
+  .idx-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+  .idx-bar-wrap {
+    flex: 2;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .idx-bar { height: 100%; border-radius: 2px; transition: width .6s ease; }
+  .idx-bar.bull { background: var(--green); }
+  .idx-bar.bear { background: var(--red); }
+  .idx-val { font-size: 12px; font-weight: 600; width: 36px; text-align: right; }
+
+  /* ── Article card ─────────────────────────────── */
+  .article-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin: 0 16px 10px;
+    cursor: pointer;
+  }
+  .article-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-bottom: 8px;
+  }
+  .article-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    line-height: 1.4;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .article-excerpt { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .article-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── Plan cards ───────────────────────────────── */
+  .plan-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 0 16px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .plan-card.featured {
+    border-color: var(--gold-dim);
+  }
+  .plan-card.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute;
+    top: 14px; right: -18px;
+    background: var(--gold);
+    color: #09090b;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    padding: 3px 28px;
+    transform: rotate(45deg) translateX(8px);
+  }
+  .plan-name {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .plan-price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .plan-period { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .plan-features { list-style: none; margin-bottom: 18px; }
+  .plan-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    padding: 5px 0;
+  }
+  .plan-feature-icon {
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Setup steps ──────────────────────────────── */
+  .step {
+    display: flex;
+    gap: 14px;
+    margin: 0 16px 6px;
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #09090b;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── Profile ──────────────────────────────────── */
+  .profile-avatar {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c9a84c22, #a0783022);
+    border: 2px solid var(--gold-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--gold);
+    margin: 0 auto 12px;
+  }
+  .profile-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    text-align: center;
+    color: var(--text);
+  }
+  .profile-plan {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 4px;
+    margin-bottom: 20px;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item-left { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text); }
+  .menu-item-icon { color: var(--muted); }
+  .menu-chevron { color: var(--muted); }
+
+  /* ── Auth screen ──────────────────────────────── */
+  .auth-hero {
+    padding: 48px 20px 32px;
+    text-align: center;
+  }
+  .auth-wordmark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--gold);
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+  .auth-tagline {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: .5px;
+  }
+  .auth-form { padding: 0 20px; }
+
+  /* ── Bot setup screen ─────────────────────────── */
+  .exchange-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 0 16px 16px;
+  }
+  .exchange-btn {
+    padding: 14px 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s;
+  }
+  .exchange-btn.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,.05);
+  }
+  .exchange-btn-name { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; }
+  .exchange-btn-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* ── Disclaimer ───────────────────────────────── */
+  .disclaimer {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.6;
+    padding: 8px 24px 16px;
+  }
+
+  /* ── Scrollable content ───────────────────────── */
+  .scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* ── Utility ──────────────────────────────────── */
+  .mt-4 { margin-top: 4px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .flex-row { display: flex; align-items: center; gap: 8px; }
+  .text-gold { color: var(--gold); }
+  .text-muted { color: var(--muted); font-size: 12px; }
+  .divider { height: 1px; background: var(--border); margin: 4px 16px; }
+</style>
 </head>
 <body>
-    <div class="card">
-        <h2>🛡️ iVolt Sovereign</h2>
-        <div class="stats">
-            <div>Battery: <span id="batt" class="neon-text">--%</span></div>
-            <div>Mode: <span id="mode" class="neon-text">SAVER</span></div>
+<div class="shell">
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN: AUTH
+  ═══════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-auth">
+    <div class="scroll-content">
+      <div class="auth-hero">
+        <div class="auth-wordmark">30×Tech</div>
+        <div class="auth-tagline">Institutional-grade signals for independent traders</div>
+      </div>
+
+      <div class="auth-form" id="auth-login-view">
+        <div id="auth-segment" class="segment" style="margin: 0 0 20px;">
+          <button class="seg-btn active" onclick="switchAuth('login',this)">Sign In</button>
+          <button class="seg-btn" onclick="switchAuth('register',this)">Register</button>
         </div>
+
+        <div class="input-wrap">
+          <label class="input-label">Email Address</label>
+          <input class="input" type="email" placeholder="you@email.com">
+        </div>
+        <div class="input-wrap">
+          <label class="input-label">Password</label>
+          <input class="input" type="password" placeholder="••••••••">
+        </div>
+
+        <div id="register-fields" style="display:none;">
+          <div class="input-wrap">
+            <label class="input-label">Confirm Password</label>
+            <input class="input" type="password" placeholder="••••••••">
+          </div>
+        </div>
+
+        <button class="btn btn-gold mt-12" onclick="goHome()" style="margin-top:8px;">
+          <span id="auth-btn-label">Continue</span>
+        </button>
+        <p class="disclaimer" style="margin-top:12px;">
+          By continuing you agree to our Terms of Service and Privacy Policy.
+          Past performance does not guarantee future results. This platform does not provide financial advice.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN: HOME — SIGNALS
+  ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-home">
+    <div class="topbar">
+      <div>
+        <div class="topbar-logo">30×Tech</div>
+        <div class="topbar-sub">Research Platform</div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-dot">Live</div>
+      </div>
     </div>
 
-    <div class="card">
-        <h3>📈 Market Pulse (NGN)</h3>
-        <canvas id="marketChart"></canvas>
+    <div class="scroll-content">
+      <div class="section-head">
+        <div class="section-title">Signals</div>
+        <div class="section-sub">Updated in real time</div>
+      </div>
+
+      <div style="padding: 0 16px 12px;">
+        <div class="segment">
+          <button class="seg-btn active" onclick="setSegment(this)">All Markets</button>
+          <button class="seg-btn" onclick="setSegment(this)">Crypto</button>
+          <button class="seg-btn" onclick="setSegment(this)">Stocks</button>
+          <button class="seg-btn" onclick="setSegment(this)">FX / Metals</button>
+        </div>
+      </div>
+
+      <!-- Signal cards -->
+      <div class="signal-card">
+        <div class="signal-header">
+          <div>
+            <div class="signal-symbol">BTC / USDT</div>
+            <div class="text-muted">Crypto · Perpetual</div>
+          </div>
+          <div class="signal-dir long">LONG</div>
+        </div>
+        <div class="signal-meta">
+          <div>
+            <div class="signal-field-label">Entry</div>
+            <div class="signal-field-val">$67,240</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Market Type</div>
+            <div class="signal-field-val">Futures</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Timeframe</div>
+            <div class="signal-field-val">4H</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Confidence</div>
+            <div class="signal-field-val text-gold">High</div>
+          </div>
+        </div>
+        <div class="signal-time">Issued · 14 Apr 2025, 09:42 UTC</div>
+      </div>
+
+      <div class="signal-card">
+        <div class="signal-header">
+          <div>
+            <div class="signal-symbol">ETH / USDT</div>
+            <div class="text-muted">Crypto · Spot</div>
+          </div>
+          <div class="signal-dir short">SHORT</div>
+        </div>
+        <div class="signal-meta">
+          <div>
+            <div class="signal-field-label">Entry</div>
+            <div class="signal-field-val">$3,184</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Market Type</div>
+            <div class="signal-field-val">Spot</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Timeframe</div>
+            <div class="signal-field-val">1H</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Confidence</div>
+            <div class="signal-field-val text-gold">Medium</div>
+          </div>
+        </div>
+        <div class="signal-time">Issued · 14 Apr 2025, 08:15 UTC</div>
+      </div>
+
+      <div class="signal-card">
+        <div class="signal-header">
+          <div>
+            <div class="signal-symbol">XAUUSD</div>
+            <div class="text-muted">Metals · Spot</div>
+          </div>
+          <div class="signal-dir long">LONG</div>
+        </div>
+        <div class="signal-meta">
+          <div>
+            <div class="signal-field-label">Entry</div>
+            <div class="signal-field-val">$2,341</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Market Type</div>
+            <div class="signal-field-val">Spot</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Timeframe</div>
+            <div class="signal-field-val">1D</div>
+          </div>
+          <div>
+            <div class="signal-field-label">Confidence</div>
+            <div class="signal-field-val text-gold">High</div>
+          </div>
+        </div>
+        <div class="signal-time">Issued · 14 Apr 2025, 06:00 UTC</div>
+      </div>
+
+      <div class="disclaimer">
+        Signals are generated by AI models. They do not constitute financial advice.
+        Always conduct your own analysis before placing any trade.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN: CONFLUENCE
+  ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-confluence">
+    <div class="topbar">
+      <div>
+        <div class="topbar-logo">Index Confluence</div>
+        <div class="topbar-sub">Multi-timeframe overview</div>
+      </div>
+      <div class="live-dot">Live</div>
     </div>
 
-    <button class="btn" onclick="Telegram.WebApp.close()">Return to Chat</button>
+    <div class="scroll-content">
+      <div class="section-head">
+        <div class="section-title">Market Confluence</div>
+        <div class="section-sub">4H · 1D · 1W</div>
+      </div>
 
-    <script>
-        // Initialize Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+      <div class="card">
+        <div class="card-label">Crypto Indices</div>
+        <div class="idx-row">
+          <div class="idx-name">CMC20</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:74%"></div></div>
+          <div class="idx-val" style="color:var(--green)">74</div>
+        </div>
+        <div class="idx-row">
+          <div class="idx-name">BTC Dominance</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:61%"></div></div>
+          <div class="idx-val" style="color:var(--green)">61</div>
+        </div>
+        <div class="idx-row">
+          <div class="idx-name">ETH / BTC</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:38%"></div></div>
+          <div class="idx-val" style="color:var(--red)">38</div>
+        </div>
+      </div>
 
-        // 2026 Charting Logic
-        const ctx = document.getElementById('marketChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['08:00', '12:00', '16:00', '20:00'],
-                datasets: [{
-                    label: 'USD/NGN',
-                    data: [1350, 1385, 1392, 1385],
-                    borderColor: '#00f2ff',
-                    tension: 0.4
-                }]
-            },
-            options: { plugins: { legend: { display: false } } }
-        });
+      <div class="card">
+        <div class="card-label">Equities</div>
+        <div class="idx-row">
+          <div class="idx-name">S&amp;P 500</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:68%"></div></div>
+          <div class="idx-val" style="color:var(--green)">68</div>
+        </div>
+        <div class="idx-row">
+          <div class="idx-name">NASDAQ 100</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:71%"></div></div>
+          <div class="idx-val" style="color:var(--green)">71</div>
+        </div>
+        <div class="idx-row">
+          <div class="idx-name">Russell 2000</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:44%"></div></div>
+          <div class="idx-val" style="color:var(--red)">44</div>
+        </div>
+      </div>
 
-        // Pull Battery Data from URL Params (passed by your bot)
-        const params = new URLSearchParams(window.location.search);
-        document.getElementById('batt').innerText = (params.get('batt') || '85') + '%';
-    </script>
+      <div class="card">
+        <div class="card-label">Macro</div>
+        <div class="idx-row">
+          <div class="idx-name">DXY</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:35%"></div></div>
+          <div class="idx-val" style="color:var(--red)">35</div>
+        </div>
+        <div class="idx-row">
+          <div class="idx-name">10Y Yield</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:58%"></div></div>
+          <div class="idx-val" style="color:var(--green)">58</div>
+        </div>
+        <div class="idx-row">
+          <div class="idx-name">VIX</div>
+          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:29%"></div></div>
+          <div class="idx-val" style="color:var(--red)">29</div>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        Confluence scores are derived from multi-timeframe RSI and MACD across tracked indices.
+        Scores above 50 indicate bullish bias; below 50 indicate bearish bias.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN: ARTICLES
+  ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-articles">
+    <div class="topbar">
+      <div>
+        <div class="topbar-logo">Research</div>
+        <div class="topbar-sub">AI Market Analysis</div>
+      </div>
+      <div class="live-dot">Updated hourly</div>
+    </div>
+
+    <div class="scroll-content">
+      <div class="section-head">
+        <div class="section-title">Latest Articles</div>
+        <div class="section-sub">Refreshed every 60 minutes</div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-tag">Macro</div>
+        <div class="article-title">DXY Weakness Confirms Risk-On Rotation Into Crypto Assets</div>
+        <div class="article-excerpt">Dollar index continues its descent from multi-month highs, historically correlated with capital rotation toward higher-beta risk assets including crypto and emerging markets.</div>
+        <div class="article-footer">
+          <span>14 Apr 2025 · 09:00 UTC</span>
+          <span>4 min read</span>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-tag">Crypto</div>
+        <div class="article-title">Bitcoin Order Flow Signals Institutional Accumulation Below $68K</div>
+        <div class="article-excerpt">Large limit orders detected between $66,800 and $67,400 on spot exchanges suggest coordinated accumulation from larger market participants ahead of halving.</div>
+        <div class="article-footer">
+          <span>14 Apr 2025 · 08:00 UTC</span>
+          <span>5 min read</span>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-tag">Equities</div>
+        <div class="article-title">NASDAQ Maintains Support — Tech Earnings Season Preview</div>
+        <div class="article-excerpt">NDX held its 20-week EMA for the third consecutive week. Options market positioning suggests relatively muted volatility expectations heading into earnings season.</div>
+        <div class="article-footer">
+          <span>14 Apr 2025 · 07:00 UTC</span>
+          <span>3 min read</span>
+        </div>
+      </div>
+
+      <div class="article-card">
+        <div class="article-tag">Metals</div>
+        <div class="article-title">Gold Breaks Key Structure — Next Resistance at $2,380</div>
+        <div class="article-excerpt">XAUUSD cleared the $2,340 resistance zone on strong volume. Structure shift confirmed on the 4H chart with the next significant supply zone sitting near $2,380.</div>
+        <div class="article-footer">
+          <span>14 Apr 2025 · 06:00 UTC</span>
+          <span>3 min read</span>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        Articles are generated by AI and are intended for informational purposes only.
+        They do not constitute investment advice or solicitation.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN: SETUP — BOT & EXCHANGE
+  ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-setup">
+    <div class="topbar">
+      <div>
+        <div class="topbar-logo">Setup</div>
+        <div class="topbar-sub">Connect your account</div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+
+      <!-- Steps overview -->
+      <div class="section-head">
+        <div class="section-title">Getting Started</div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Select a Plan</div>
+          <div class="step-desc">Choose the tier that suits your trading needs. You can upgrade at any time.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Connect Your Exchange</div>
+          <div class="step-desc">Provide read-only API credentials from your exchange. We never execute trades on your behalf.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Link Your Telegram Bot</div>
+          <div class="step-desc">Paste your Telegram bot token to receive signals directly in your private channel.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Choose Signal Preferences</div>
+          <div class="step-desc">Select signal type, market type (spot or futures), and notification frequency.</div>
+        </div>
+      </div>
+
+      <!-- Choose exchange -->
+      <div class="section-head" style="padding-top:20px;">
+        <div class="section-title">Exchange</div>
+      </div>
+
+      <div class="exchange-grid">
+        <div class="exchange-btn selected" onclick="selectExchange(this)">
+          <div class="exchange-btn-name">Binance</div>
+          <div class="exchange-btn-sub">Spot &amp; Futures</div>
+        </div>
+        <div class="exchange-btn" onclick="selectExchange(this)">
+          <div class="exchange-btn-name">Bybit</div>
+          <div class="exchange-btn-sub">Spot &amp; Futures</div>
+        </div>
+        <div class="exchange-btn" onclick="selectExchange(this)">
+          <div class="exchange-btn-name">Bitget</div>
+          <div class="exchange-btn-sub">Spot &amp; Futures</div>
+        </div>
+        <div class="exchange-btn" onclick="selectExchange(this)">
+          <div class="exchange-btn-name">OKX</div>
+          <div class="exchange-btn-sub">Spot &amp; Futures</div>
+        </div>
+      </div>
+
+      <!-- API credentials -->
+      <div class="card" style="margin-top:4px;">
+        <div class="card-label">Exchange API Credentials</div>
+        <div class="input-wrap" style="margin-bottom:12px;">
+          <label class="input-label">API Key</label>
+          <input class="input" type="text" placeholder="Enter your API key">
+        </div>
+        <div class="input-wrap" style="margin-bottom:0;">
+          <label class="input-label">API Secret</label>
+          <input class="input" type="password" placeholder="Enter your API secret">
+        </div>
+        <div class="text-muted mt-8" style="font-size:11px; line-height:1.5;">
+          Use read-only permissions only. Do not enable withdrawal or trading permissions.
+        </div>
+      </div>
+
+      <!-- Telegram bot -->
+      <div class="card">
+        <div class="card-label">Telegram Delivery</div>
+        <div class="input-wrap" style="margin-bottom:0;">
+          <label class="input-label">Bot Token</label>
+          <input class="input" type="text" placeholder="Paste your bot token from @BotFather">
+        </div>
+        <div class="text-muted mt-8" style="font-size:11px; line-height:1.5;">
+          Create a bot via @BotFather on Telegram and paste the token here.
+          Signals will be delivered to your private bot.
+        </div>
+      </div>
+
+      <!-- Signal preferences -->
+      <div class="card">
+        <div class="card-label">Signal Preferences</div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Order Flow Signals</div>
+            <div class="toggle-desc">Signals based on real-time order book pressure</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="handleToggle(this)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Money Flow Signals</div>
+            <div class="toggle-desc">Signals based on capital flow and volume analysis</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="handleToggle(this)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Spot Market</div>
+            <div class="toggle-desc">Receive signals for spot trading</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="handleToggle(this)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Futures Market</div>
+            <div class="toggle-desc">Receive signals for perpetual futures</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" onchange="handleToggle(this)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Index Confluence Alerts</div>
+            <div class="toggle-desc">Receive confluence shift notifications</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked onchange="handleToggle(this)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+
+      <div style="padding: 4px 16px 16px;">
+        <button class="btn btn-gold">Save Settings</button>
+      </div>
+
+      <div class="disclaimer">
+        Your API credentials are encrypted at rest and are never used to place trades.
+        We only read position and market data for signal generation purposes.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN: PLANS
+  ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-plans">
+    <div class="topbar">
+      <div>
+        <div class="topbar-logo">Plans</div>
+        <div class="topbar-sub">Choose your access level</div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <div class="section-head">
+        <div class="section-title">Membership Plans</div>
+        <div class="section-sub">Cancel anytime</div>
+      </div>
+
+      <!-- Free -->
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-period">No credit card required</div>
+        <ul class="plan-features">
+          <li class="plan-feature"><span class="plan-feature-icon">›</span>One signal per day</li>
+          <li class="plan-feature"><span class="plan-feature-icon">›</span>Public market articles</li>
+          <li class="plan-feature"><span class="plan-feature-icon">›</span>Basic index overview</li>
+        </ul>
+        <button class="btn btn-outline">Current Plan</button>
+      </div>
+
+      <!-- Order Flow -->
+      <div class="plan-card featured">
+        <div class="plan-name">Order Flow</div>
+        <div class="plan-price">$49</div>
+        <div class="plan-period">per month · billed monthly</div>
+        <ul class="plan-features">
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>All order flow signals — all markets</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Spot and futures signal delivery</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Full index confluence dashboard</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Hourly AI market articles</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Telegram bot integration</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Exchange API connection</li>
+        </ul>
+        <button class="btn btn-gold">Subscribe — $49 / mo</button>
+      </div>
+
+      <!-- Money Flow -->
+      <div class="plan-card">
+        <div class="plan-name">Money Flow</div>
+        <div class="plan-price">$89</div>
+        <div class="plan-period">per month · billed monthly</div>
+        <ul class="plan-features">
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Everything in Order Flow</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Money flow and capital rotation signals</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Cross-asset correlation alerts</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Priority Telegram delivery</li>
+          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Dedicated support channel</li>
+        </ul>
+        <button class="btn btn-gold">Subscribe — $89 / mo</button>
+      </div>
+
+      <div class="disclaimer">
+        Subscriptions auto-renew monthly. Cancel at any time from your account settings.
+        All payments are processed securely. Prices shown in USD.
+        Membership does not guarantee profitable trading outcomes.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN: PROFILE
+  ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-profile">
+    <div class="topbar">
+      <div>
+        <div class="topbar-logo">Account</div>
+        <div class="topbar-sub">Your profile</div>
+      </div>
+    </div>
+
+    <div class="scroll-content">
+      <div style="padding: 24px 16px 12px; text-align:center;">
+        <div class="profile-avatar">J</div>
+        <div class="profile-name">John Trader</div>
+        <div class="profile-plan">Order Flow Plan</div>
+      </div>
+
+      <div class="card card-sm">
+        <div class="menu-item" onclick="">
+          <div class="menu-item-left">
+            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Personal Details
+          </div>
+          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="menu-item" onclick="showScreen('screen-plans')">
+          <div class="menu-item-left">
+            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            Subscription &amp; Billing
+          </div>
+          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="menu-item" onclick="showScreen('screen-setup')">
+          <div class="menu-item-left">
+            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            Bot &amp; Exchange Settings
+          </div>
+          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="menu-item" onclick="">
+          <div class="menu-item-left">
+            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+            Notification Preferences
+          </div>
+          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="menu-item" onclick="">
+          <div class="menu-item-left">
+            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Security
+          </div>
+          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="menu-item" onclick="">
+          <div class="menu-item-left">
+            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Help &amp; Support
+          </div>
+          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div style="padding: 8px 16px 0;">
+        <button class="btn btn-outline" style="color: var(--red); border-color: rgba(231,76,60,.3);" onclick="showScreen('screen-auth')">
+          Sign Out
+        </button>
+      </div>
+
+      <div class="disclaimer" style="margin-top:16px;">
+        30xTech Research · Version 1.0.0<br>
+        © 2025 30xTech Research. All rights reserved.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       BOTTOM NAV (hidden on auth)
+  ═══════════════════════════════════════════════ -->
+  <nav class="nav" id="bottom-nav" style="display:none;">
+    <button class="nav-item active" id="nav-home" onclick="navigate('home')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Signals
+    </button>
+    <button class="nav-item" id="nav-confluence" onclick="navigate('confluence')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M3 3v18h18"/><path d="M7 16l4-8 4 6 4-4"/>
+      </svg>
+      Confluence
+    </button>
+    <button class="nav-item" id="nav-articles" onclick="navigate('articles')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+      </svg>
+      Research
+    </button>
+    <button class="nav-item" id="nav-setup" onclick="navigate('setup')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+      Setup
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="navigate('profile')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      Account
+    </button>
+  </nav>
+</div>
+
+<script>
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function goHome() {
+    document.getElementById('bottom-nav').style.display = 'flex';
+    showScreen('screen-home');
+    updateNav('home');
+  }
+
+  function navigate(tab) {
+    updateNav(tab);
+    showScreen('screen-' + tab);
+  }
+
+  function updateNav(tab) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const el = document.getElementById('nav-' + tab);
+    if (el) el.classList.add('active');
+  }
+
+  function switchAuth(mode, btn) {
+    document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('register-fields').style.display = mode === 'register' ? 'block' : 'none';
+    document.getElementById('auth-btn-label').textContent = mode === 'register' ? 'Create Account' : 'Continue';
+  }
+
+  function setSegment(btn) {
+    btn.closest('.segment').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function selectExchange(el) {
+    el.closest('.exchange-grid').querySelectorAll('.exchange-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function handleToggle() {}
+</script>
 </body>
 </html>
