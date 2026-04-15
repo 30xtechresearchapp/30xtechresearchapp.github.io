@@ -3,1338 +3,990 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>30xTech Research</title>
+<title>30×Tech Research</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:        #09090b;
-    --surface:   #111114;
-    --card:      #16161a;
-    --border:    #232329;
-    --gold:      #c9a84c;
-    --gold-dim:  #7a6230;
-    --text:      #e8e8ec;
-    --muted:     #6b6b78;
-    --accent:    #1a1a20;
-    --green:     #2ecc71;
-    --red:       #e74c3c;
-    --radius:    16px;
-    --radius-sm: 10px;
-  }
+:root{
+  --bg:#09090b;--surface:#111114;--card:#16161a;--border:#222228;
+  --gold:#c9a84c;--gold-dim:#7a6230;--gold-bg:rgba(201,168,76,.07);
+  --text:#e8e8ec;--muted:#64646e;--accent:#18181e;
+  --green:#2ecc71;--red:#e74c3c;--amber:#f39c12;
+  --r:14px;--r-sm:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+.shell{max-width:430px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+.screen{display:none;flex-direction:column;flex:1;padding-bottom:76px;animation:fi .22s ease;}
+.screen.active{display:flex;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);}
+.tb-logo{font-family:'DM Serif Display',serif;font-size:18px;color:var(--gold);letter-spacing:.3px;}
+.tb-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.6px;margin-top:-1px;}
+.live-dot{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);font-weight:500;}
+.live-dot::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
 
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
+/* Nav */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px 14px;cursor:pointer;gap:3px;color:var(--muted);font-size:10px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;border:none;background:none;transition:color .15s;}
+.ni.active{color:var(--gold);}
+.ni-ic{width:20px;height:20px;stroke-width:1.6;}
 
-  /* ── Layout shell ─────────────────────────────── */
-  .shell {
-    max-width: 420px;
-    margin: 0 auto;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
+/* Scroll */
+.sc{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sc::-webkit-scrollbar{display:none;}
 
-  /* ── Screens ──────────────────────────────────── */
-  .screen {
-    display: none;
-    flex-direction: column;
-    flex: 1;
-    padding-bottom: 80px;
-    animation: fadeIn .25s ease;
-  }
-  .screen.active { display: flex; }
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin:0 14px 10px;}
+.card-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.8px;color:var(--muted);font-weight:600;margin-bottom:10px;}
+.section-head{padding:18px 18px 10px;display:flex;align-items:baseline;justify-content:space-between;}
+.sh-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);}
+.sh-sub{font-size:11px;color:var(--muted);}
 
-  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;width:100%;padding:14px;border-radius:var(--r-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;}
+.btn:active{transform:scale(.98);}
+.btn-gold{background:linear-gradient(135deg,#c9a84c,#a07830);color:#09090b;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-ghost{background:var(--accent);color:var(--text);}
 
-  /* ── Top bar ──────────────────────────────────── */
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 20px 12px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-  }
-  .topbar-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    color: var(--gold);
-    letter-spacing: .3px;
-  }
-  .topbar-sub {
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-top: -2px;
-  }
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .live-dot {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--green);
-    font-weight: 500;
-    letter-spacing: .5px;
-  }
-  .live-dot::before {
-    content: '';
-    width: 7px; height: 7px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity:1; } 50% { opacity:.3; }
-  }
+/* Inputs */
+.iw{margin-bottom:12px;}
+.il{font-size:10px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:block;}
+.inp{width:100%;background:var(--accent);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 13px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .15s;}
+.inp:focus{border-color:var(--gold-dim);}
+.inp::placeholder{color:var(--muted);}
 
-  /* ── Bottom nav ───────────────────────────────── */
-  .nav {
-    position: fixed;
-    bottom: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 420px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    z-index: 100;
-  }
-  .nav-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 4px 14px;
-    cursor: pointer;
-    gap: 4px;
-    transition: color .15s;
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-    border: none;
-    background: none;
-  }
-  .nav-item.active { color: var(--gold); }
-  .nav-icon {
-    width: 22px; height: 22px;
-    stroke-width: 1.6;
-  }
+/* Segment */
+.seg{display:flex;background:var(--accent);border-radius:var(--r-sm);padding:3px;gap:2px;}
+.sb{flex:1;padding:8px 6px;border-radius:8px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;letter-spacing:.3px;transition:background .15s,color .15s;}
+.sb.active{background:var(--card);color:var(--gold);}
 
-  /* ── Cards ────────────────────────────────────── */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin: 0 16px 12px;
-  }
-  .card-sm {
-    padding: 14px 16px;
-  }
-  .card-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.8px;
-    color: var(--muted);
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
+/* Signal cards (mirrors _signal_card / _spot_signal_card from 30x.py) */
+.sig{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin:0 14px 10px;}
+.sig-type{font-size:10px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.sig-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.sig-sym{font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);}
+.sig-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.dir{font-size:11px;font-weight:700;letter-spacing:.8px;padding:4px 10px;border-radius:6px;}
+.dir.long{background:rgba(46,204,113,.12);color:var(--green);}
+.dir.short{background:rgba(231,76,60,.12);color:var(--red);}
+.sig-div{height:1px;background:var(--border);margin:10px 0;}
+.sig-row{display:flex;align-items:baseline;justify-content:space-between;padding:4px 0;}
+.srl{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:600;}
+.srv{font-size:14px;font-weight:500;}
+.srv.e{color:var(--gold);}
+.srv.tp{color:var(--green);}
+.srv.sl{color:var(--red);}
+.sig-time{font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
 
-  /* ── Section header ───────────────────────────── */
-  .section-head {
-    padding: 20px 20px 10px;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-  }
-  .section-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    color: var(--text);
-  }
-  .section-sub {
-    font-size: 11px;
-    color: var(--muted);
-  }
+/* Confluence bars */
+.idx-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);}
+.idx-row:last-child{border-bottom:none;padding-bottom:0;}
+.idx-row:first-child{padding-top:0;}
+.idx-name{font-size:13px;font-weight:500;color:var(--text);width:88px;flex-shrink:0;}
+.idx-tf{font-size:10px;color:var(--muted);width:28px;text-align:center;flex-shrink:0;}
+.ibw{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.ib{height:100%;border-radius:2px;transition:width .5s;}
+.ib.b{background:var(--green);}
+.ib.r{background:var(--red);}
+.idx-v{font-size:12px;font-weight:600;width:30px;text-align:right;flex-shrink:0;}
+.idx-vote{font-size:10px;color:var(--muted);width:60px;text-align:right;flex-shrink:0;}
 
-  /* ── Buttons ──────────────────────────────────── */
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    padding: 15px;
-    border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: .4px;
-    cursor: pointer;
-    border: none;
-    transition: opacity .15s, transform .1s;
-  }
-  .btn:active { transform: scale(.98); }
-  .btn-gold {
-    background: linear-gradient(135deg, #c9a84c, #a07830);
-    color: #09090b;
-  }
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text);
-  }
-  .btn-ghost {
-    background: var(--accent);
-    color: var(--text);
-  }
+/* Market update cards — matches _build_template_article subscriber format */
+.art{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin:0 14px 10px;}
+.art-time{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.art-bias-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);}
+.art-bias-row:last-child{border-bottom:none;}
+.art-cat{font-size:13px;font-weight:600;color:var(--text);flex:1;}
+.art-bias{font-size:12px;font-weight:600;}
+.art-bias.bull{color:var(--green);}
+.art-bias.bear{color:var(--red);}
+.art-bias.neutral{color:var(--muted);}
+.art-prices{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+.art-px-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;}
+.art-px-sym{color:var(--muted);}
+.art-px-val{color:var(--text);font-weight:500;font-family:monospace;}
+.art-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
 
-  /* ── Input ────────────────────────────────────── */
-  .input-wrap {
-    margin-bottom: 14px;
-  }
-  .input-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .8px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 6px;
-    display: block;
-  }
-  .input {
-    width: 100%;
-    background: var(--accent);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 13px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    outline: none;
-    transition: border-color .15s;
-  }
-  .input:focus { border-color: var(--gold-dim); }
-  .input::placeholder { color: var(--muted); }
+/* Plan cards */
+.plan{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin:0 14px 12px;position:relative;overflow:hidden;}
+.plan.hot{border-color:var(--gold-dim);background:linear-gradient(160deg,#16161a,#1a1710);}
+.plan-badge{position:absolute;top:14px;right:-20px;background:var(--gold);color:#09090b;font-size:8px;font-weight:800;letter-spacing:1.5px;padding:3px 32px;transform:rotate(45deg) translateX(8px);}
+.plan-type{font-size:9px;text-transform:uppercase;letter-spacing:1.6px;color:var(--muted);font-weight:600;margin-bottom:3px;}
+.plan-price{font-family:'DM Serif Display',serif;font-size:24px;color:var(--gold);}
+.plan-name{font-family:'DM Serif Display',serif;font-size:21px;color:var(--text);margin-top:1px;}
+.plan-period{font-size:12px;color:var(--muted);margin:3px 0 14px;}
+.pf{list-style:none;margin-bottom:16px;}
+.pfi{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text);padding:4px 0;}
+.pfd{color:var(--gold);flex-shrink:0;font-size:12px;margin-top:2px;}
+.pay-row{display:flex;gap:8px;}
+.pbtn{flex:1;padding:11px 8px;border-radius:var(--r-sm);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:none;text-align:center;transition:opacity .15s;text-decoration:none;display:block;}
+.pbtn:active{opacity:.8;}
+.pbtn-pp{background:linear-gradient(135deg,#c9a84c,#a07830);color:#09090b;}
+.pbtn-ps{background:var(--accent);border:1px solid var(--border);color:var(--text);}
 
-  /* ── Toggle ───────────────────────────────────── */
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
-  .toggle-row:first-child { padding-top: 0; }
-  .toggle-label { font-size: 14px; color: var(--text); }
-  .toggle-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .toggle {
-    position: relative;
-    width: 44px; height: 24px;
-    flex-shrink: 0;
-  }
-  .toggle input { display: none; }
-  .toggle-track {
-    position: absolute;
-    inset: 0;
-    background: var(--border);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .toggle input:checked + .toggle-track { background: var(--gold); }
-  .toggle-thumb {
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 18px; height: 18px;
-    background: white;
-    border-radius: 50%;
-    transition: transform .2s;
-    pointer-events: none;
-  }
-  .toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+/* Setup steps */
+.step{display:flex;gap:12px;margin:0 14px 6px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);align-items:flex-start;}
+.sn{width:26px;height:26px;border-radius:50%;background:var(--gold);color:#09090b;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.st{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.sd{font-size:12px;color:var(--muted);line-height:1.5;}
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 14px 12px;}
+.eb{padding:13px 10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;text-align:center;transition:border-color .15s,background .15s;}
+.eb.sel{border-color:var(--gold);background:var(--gold-bg);}
+.en{font-size:13px;font-weight:600;color:var(--text);}
+.es{font-size:10px;color:var(--muted);margin-top:2px;}
 
-  /* ── Segment control ──────────────────────────── */
-  .segment {
-    display: flex;
-    background: var(--accent);
-    border-radius: var(--radius-sm);
-    padding: 3px;
-    margin-bottom: 16px;
-    gap: 3px;
-  }
-  .seg-btn {
-    flex: 1;
-    padding: 9px 8px;
-    border-radius: 8px;
-    border: none;
-    background: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    cursor: pointer;
-    letter-spacing: .4px;
-    transition: background .15s, color .15s;
-  }
-  .seg-btn.active {
-    background: var(--card);
-    color: var(--gold);
-  }
+/* Profile */
+.pfa{width:60px;height:60px;border-radius:50%;background:var(--gold-bg);border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold);margin:0 auto 10px;}
+.pfn{font-family:'DM Serif Display',serif;font-size:20px;text-align:center;color:var(--text);}
+.pfp{text-align:center;font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold);margin:4px 0 18px;}
+.mi{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.mi:last-child{border-bottom:none;}
+.mil{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text);}
 
-  /* ── Signal card ──────────────────────────────── */
-  .signal-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin: 0 16px 10px;
-  }
-  .signal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .signal-symbol {
-    font-family: 'DM Serif Display', serif;
-    font-size: 17px;
-    color: var(--text);
-  }
-  .signal-dir {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    border-radius: 6px;
-  }
-  .signal-dir.long { background: rgba(46,204,113,.12); color: var(--green); }
-  .signal-dir.short { background: rgba(231,76,60,.12); color: var(--red); }
-  .signal-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .signal-field-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--muted);
-    font-weight: 600;
-  }
-  .signal-field-val {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    margin-top: 2px;
-  }
-  .signal-time {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border);
-  }
+/* Notice / info box */
+.notice{background:var(--gold-bg);border:1px solid var(--gold-dim);border-radius:var(--r-sm);padding:10px 13px;font-size:12px;color:var(--gold);line-height:1.5;margin:0 14px 12px;}
+.info{background:var(--accent);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 13px;font-size:12px;color:var(--muted);line-height:1.5;margin:0 14px 10px;}
+.usdc{background:var(--accent);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);font-family:monospace;word-break:break-all;margin-top:6px;}
 
-  /* ── Index confluence bar ─────────────────────── */
-  .idx-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .idx-row:last-child { border-bottom: none; padding-bottom: 0; }
-  .idx-row:first-child { padding-top: 0; }
-  .idx-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
-  .idx-bar-wrap {
-    flex: 2;
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .idx-bar { height: 100%; border-radius: 2px; transition: width .6s ease; }
-  .idx-bar.bull { background: var(--green); }
-  .idx-bar.bear { background: var(--red); }
-  .idx-val { font-size: 12px; font-weight: 600; width: 36px; text-align: right; }
+/* Status badge */
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.5px;padding:3px 10px;border-radius:20px;background:rgba(46,204,113,.1);color:var(--green);border:1px solid rgba(46,204,113,.2);}
+.status-badge.err{background:rgba(231,76,60,.1);color:var(--red);border-color:rgba(231,76,60,.2);}
+.status-badge.warn{background:rgba(243,156,18,.1);color:var(--amber);border-color:rgba(243,156,18,.2);}
 
-  /* ── Article card ─────────────────────────────── */
-  .article-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px;
-    margin: 0 16px 10px;
-    cursor: pointer;
-  }
-  .article-tag {
-    display: inline-block;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    border: 1px solid var(--gold-dim);
-    border-radius: 4px;
-    padding: 2px 7px;
-    margin-bottom: 8px;
-  }
-  .article-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 15px;
-    line-height: 1.4;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .article-excerpt { font-size: 12px; color: var(--muted); line-height: 1.5; }
-  .article-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 12px;
-    font-size: 11px;
-    color: var(--muted);
-  }
+/* Auth */
+.auth-hero{padding:44px 20px 28px;text-align:center;}
+.auth-wm{font-family:'DM Serif Display',serif;font-size:36px;color:var(--gold);}
+.auth-tag{font-size:13px;color:var(--muted);margin-top:4px;}
+.disc{font-size:10px;color:var(--muted);text-align:center;line-height:1.6;padding:6px 20px 14px;}
 
-  /* ── Plan cards ───────────────────────────────── */
-  .plan-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin: 0 16px 12px;
-    position: relative;
-    overflow: hidden;
-  }
-  .plan-card.featured {
-    border-color: var(--gold-dim);
-  }
-  .plan-card.featured::before {
-    content: 'MOST POPULAR';
-    position: absolute;
-    top: 14px; right: -18px;
-    background: var(--gold);
-    color: #09090b;
-    font-size: 8px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    padding: 3px 28px;
-    transform: rotate(45deg) translateX(8px);
-  }
-  .plan-name {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-  .plan-price {
-    font-family: 'DM Serif Display', serif;
-    font-size: 32px;
-    color: var(--text);
-    line-height: 1;
-    margin-bottom: 2px;
-  }
-  .plan-period { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-  .plan-features { list-style: none; margin-bottom: 18px; }
-  .plan-feature {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text);
-    padding: 5px 0;
-  }
-  .plan-feature-icon {
-    color: var(--gold);
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  /* ── Setup steps ──────────────────────────────── */
-  .step {
-    display: flex;
-    gap: 14px;
-    margin: 0 16px 6px;
-    padding: 16px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    align-items: flex-start;
-  }
-  .step-num {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--gold);
-    color: #09090b;
-    font-size: 12px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
-
-  /* ── Profile ──────────────────────────────────── */
-  .profile-avatar {
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #c9a84c22, #a0783022);
-    border: 2px solid var(--gold-dim);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'DM Serif Display', serif;
-    font-size: 24px;
-    color: var(--gold);
-    margin: 0 auto 12px;
-  }
-  .profile-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    text-align: center;
-    color: var(--text);
-  }
-  .profile-plan {
-    text-align: center;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-top: 4px;
-    margin-bottom: 20px;
-  }
-  .menu-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-  }
-  .menu-item:last-child { border-bottom: none; }
-  .menu-item-left { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text); }
-  .menu-item-icon { color: var(--muted); }
-  .menu-chevron { color: var(--muted); }
-
-  /* ── Auth screen ──────────────────────────────── */
-  .auth-hero {
-    padding: 48px 20px 32px;
-    text-align: center;
-  }
-  .auth-wordmark {
-    font-family: 'DM Serif Display', serif;
-    font-size: 36px;
-    color: var(--gold);
-    letter-spacing: .5px;
-    margin-bottom: 6px;
-  }
-  .auth-tagline {
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: .5px;
-  }
-  .auth-form { padding: 0 20px; }
-
-  /* ── Bot setup screen ─────────────────────────── */
-  .exchange-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin: 0 16px 16px;
-  }
-  .exchange-btn {
-    padding: 14px 10px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    text-align: center;
-    transition: border-color .15s;
-  }
-  .exchange-btn.selected {
-    border-color: var(--gold);
-    background: rgba(201,168,76,.05);
-  }
-  .exchange-btn-name { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; }
-  .exchange-btn-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-  /* ── Disclaimer ───────────────────────────────── */
-  .disclaimer {
-    font-size: 10px;
-    color: var(--muted);
-    text-align: center;
-    line-height: 1.6;
-    padding: 8px 24px 16px;
-  }
-
-  /* ── Scrollable content ───────────────────────── */
-  .scroll-content {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .scroll-content::-webkit-scrollbar { display: none; }
-
-  /* ── Utility ──────────────────────────────────── */
-  .mt-4 { margin-top: 4px; }
-  .mt-8 { margin-top: 8px; }
-  .mt-12 { margin-top: 12px; }
-  .mt-16 { margin-top: 16px; }
-  .flex-row { display: flex; align-items: center; gap: 8px; }
-  .text-gold { color: var(--gold); }
-  .text-muted { color: var(--muted); font-size: 12px; }
-  .divider { height: 1px; background: var(--border); margin: 4px 16px; }
+/* Sync status bar */
+.sync-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);font-size:10px;color:var(--muted);}
+.sync-indicator{display:flex;align-items:center;gap:5px;}
+.sync-dot{width:5px;height:5px;border-radius:50%;background:var(--green);}
+.sync-dot.err{background:var(--red);}
+.sync-dot.sync{background:var(--amber);animation:pulse 1s infinite;}
 </style>
 </head>
 <body>
 <div class="shell">
 
-  <!-- ══════════════════════════════════════════════
-       SCREEN: AUTH
-  ═══════════════════════════════════════════════ -->
-  <div class="screen active" id="screen-auth">
-    <div class="scroll-content">
-      <div class="auth-hero">
-        <div class="auth-wordmark">30×Tech</div>
-        <div class="auth-tagline">Institutional-grade signals for independent traders</div>
+<!-- ═══════════════════════════════════════
+     AUTH
+═══════════════════════════════════════ -->
+<div class="screen active" id="screen-auth">
+  <div class="sc">
+    <div class="auth-hero">
+      <div class="auth-wm">30×Tech Research</div>
+      <div class="auth-tag">Institutional-grade signals for independent traders</div>
+    </div>
+    <div style="padding:0 18px;">
+      <div class="seg" style="margin-bottom:18px;">
+        <button class="sb active" onclick="switchAuth('login',this)">Sign In</button>
+        <button class="sb" onclick="switchAuth('register',this)">Register</button>
       </div>
-
-      <div class="auth-form" id="auth-login-view">
-        <div id="auth-segment" class="segment" style="margin: 0 0 20px;">
-          <button class="seg-btn active" onclick="switchAuth('login',this)">Sign In</button>
-          <button class="seg-btn" onclick="switchAuth('register',this)">Register</button>
-        </div>
-
-        <div class="input-wrap">
-          <label class="input-label">Email Address</label>
-          <input class="input" type="email" placeholder="you@email.com">
-        </div>
-        <div class="input-wrap">
-          <label class="input-label">Password</label>
-          <input class="input" type="password" placeholder="••••••••">
-        </div>
-
-        <div id="register-fields" style="display:none;">
-          <div class="input-wrap">
-            <label class="input-label">Confirm Password</label>
-            <input class="input" type="password" placeholder="••••••••">
-          </div>
-        </div>
-
-        <button class="btn btn-gold mt-12" onclick="goHome()" style="margin-top:8px;">
-          <span id="auth-btn-label">Continue</span>
-        </button>
-        <p class="disclaimer" style="margin-top:12px;">
-          By continuing you agree to our Terms of Service and Privacy Policy.
-          Past performance does not guarantee future results. This platform does not provide financial advice.
-        </p>
+      <div class="iw"><label class="il">Email Address</label><input class="inp" type="email" placeholder="you@email.com" id="auth-email"></div>
+      <div class="iw"><label class="il">Password</label><input class="inp" type="password" placeholder="••••••••" id="auth-pw"></div>
+      <div id="reg-extra" style="display:none;">
+        <div class="iw"><label class="il">Confirm Password</label><input class="inp" type="password" placeholder="••••••••"></div>
       </div>
+      <button class="btn btn-gold" style="margin-top:8px;" onclick="authAction()"><span id="auth-lbl">Continue</span></button>
+      <div id="auth-status" style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px;min-height:18px;"></div>
+      <p class="disc" style="margin-top:4px;">By continuing you agree to our Terms of Service. Past performance does not guarantee future results.</p>
     </div>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════════════════
-       SCREEN: HOME — SIGNALS
-  ═══════════════════════════════════════════════ -->
-  <div class="screen" id="screen-home">
-    <div class="topbar">
-      <div>
-        <div class="topbar-logo">30×Tech</div>
-        <div class="topbar-sub">Research Platform</div>
-      </div>
-      <div class="topbar-right">
-        <div class="live-dot">Live</div>
-      </div>
-    </div>
-
-    <div class="scroll-content">
-      <div class="section-head">
-        <div class="section-title">Signals</div>
-        <div class="section-sub">Updated in real time</div>
-      </div>
-
-      <div style="padding: 0 16px 12px;">
-        <div class="segment">
-          <button class="seg-btn active" onclick="setSegment(this)">All Markets</button>
-          <button class="seg-btn" onclick="setSegment(this)">Crypto</button>
-          <button class="seg-btn" onclick="setSegment(this)">Stocks</button>
-          <button class="seg-btn" onclick="setSegment(this)">FX / Metals</button>
-        </div>
-      </div>
-
-      <!-- Signal cards -->
-      <div class="signal-card">
-        <div class="signal-header">
-          <div>
-            <div class="signal-symbol">BTC / USDT</div>
-            <div class="text-muted">Crypto · Perpetual</div>
-          </div>
-          <div class="signal-dir long">LONG</div>
-        </div>
-        <div class="signal-meta">
-          <div>
-            <div class="signal-field-label">Entry</div>
-            <div class="signal-field-val">$67,240</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Market Type</div>
-            <div class="signal-field-val">Futures</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Timeframe</div>
-            <div class="signal-field-val">4H</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Confidence</div>
-            <div class="signal-field-val text-gold">High</div>
-          </div>
-        </div>
-        <div class="signal-time">Issued · 14 Apr 2025, 09:42 UTC</div>
-      </div>
-
-      <div class="signal-card">
-        <div class="signal-header">
-          <div>
-            <div class="signal-symbol">ETH / USDT</div>
-            <div class="text-muted">Crypto · Spot</div>
-          </div>
-          <div class="signal-dir short">SHORT</div>
-        </div>
-        <div class="signal-meta">
-          <div>
-            <div class="signal-field-label">Entry</div>
-            <div class="signal-field-val">$3,184</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Market Type</div>
-            <div class="signal-field-val">Spot</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Timeframe</div>
-            <div class="signal-field-val">1H</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Confidence</div>
-            <div class="signal-field-val text-gold">Medium</div>
-          </div>
-        </div>
-        <div class="signal-time">Issued · 14 Apr 2025, 08:15 UTC</div>
-      </div>
-
-      <div class="signal-card">
-        <div class="signal-header">
-          <div>
-            <div class="signal-symbol">XAUUSD</div>
-            <div class="text-muted">Metals · Spot</div>
-          </div>
-          <div class="signal-dir long">LONG</div>
-        </div>
-        <div class="signal-meta">
-          <div>
-            <div class="signal-field-label">Entry</div>
-            <div class="signal-field-val">$2,341</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Market Type</div>
-            <div class="signal-field-val">Spot</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Timeframe</div>
-            <div class="signal-field-val">1D</div>
-          </div>
-          <div>
-            <div class="signal-field-label">Confidence</div>
-            <div class="signal-field-val text-gold">High</div>
-          </div>
-        </div>
-        <div class="signal-time">Issued · 14 Apr 2025, 06:00 UTC</div>
-      </div>
-
-      <div class="disclaimer">
-        Signals are generated by AI models. They do not constitute financial advice.
-        Always conduct your own analysis before placing any trade.
-      </div>
-    </div>
+<!-- ═══════════════════════════════════════
+     SIGNALS
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-home">
+  <div class="topbar">
+    <div><div class="tb-logo">30×Tech Research</div><div class="tb-sub">Signal Feed</div></div>
+    <div class="live-dot">Live</div>
   </div>
-
-  <!-- ══════════════════════════════════════════════
-       SCREEN: CONFLUENCE
-  ═══════════════════════════════════════════════ -->
-  <div class="screen" id="screen-confluence">
-    <div class="topbar">
-      <div>
-        <div class="topbar-logo">Index Confluence</div>
-        <div class="topbar-sub">Multi-timeframe overview</div>
-      </div>
-      <div class="live-dot">Live</div>
-    </div>
-
-    <div class="scroll-content">
-      <div class="section-head">
-        <div class="section-title">Market Confluence</div>
-        <div class="section-sub">4H · 1D · 1W</div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Crypto Indices</div>
-        <div class="idx-row">
-          <div class="idx-name">CMC20</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:74%"></div></div>
-          <div class="idx-val" style="color:var(--green)">74</div>
-        </div>
-        <div class="idx-row">
-          <div class="idx-name">BTC Dominance</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:61%"></div></div>
-          <div class="idx-val" style="color:var(--green)">61</div>
-        </div>
-        <div class="idx-row">
-          <div class="idx-name">ETH / BTC</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:38%"></div></div>
-          <div class="idx-val" style="color:var(--red)">38</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Equities</div>
-        <div class="idx-row">
-          <div class="idx-name">S&amp;P 500</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:68%"></div></div>
-          <div class="idx-val" style="color:var(--green)">68</div>
-        </div>
-        <div class="idx-row">
-          <div class="idx-name">NASDAQ 100</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:71%"></div></div>
-          <div class="idx-val" style="color:var(--green)">71</div>
-        </div>
-        <div class="idx-row">
-          <div class="idx-name">Russell 2000</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:44%"></div></div>
-          <div class="idx-val" style="color:var(--red)">44</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Macro</div>
-        <div class="idx-row">
-          <div class="idx-name">DXY</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:35%"></div></div>
-          <div class="idx-val" style="color:var(--red)">35</div>
-        </div>
-        <div class="idx-row">
-          <div class="idx-name">10Y Yield</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bull" style="width:58%"></div></div>
-          <div class="idx-val" style="color:var(--green)">58</div>
-        </div>
-        <div class="idx-row">
-          <div class="idx-name">VIX</div>
-          <div class="idx-bar-wrap"><div class="idx-bar bear" style="width:29%"></div></div>
-          <div class="idx-val" style="color:var(--red)">29</div>
-        </div>
-      </div>
-
-      <div class="disclaimer">
-        Confluence scores are derived from multi-timeframe RSI and MACD across tracked indices.
-        Scores above 50 indicate bullish bias; below 50 indicate bearish bias.
-      </div>
-    </div>
+  <div class="sync-bar">
+    <div class="sync-indicator"><div class="sync-dot" id="sig-sync-dot"></div><span id="sig-sync-txt">Synced with server</span></div>
+    <span id="sig-sync-time">—</span>
   </div>
-
-  <!-- ══════════════════════════════════════════════
-       SCREEN: ARTICLES
-  ═══════════════════════════════════════════════ -->
-  <div class="screen" id="screen-articles">
-    <div class="topbar">
-      <div>
-        <div class="topbar-logo">Research</div>
-        <div class="topbar-sub">AI Market Analysis</div>
-      </div>
-      <div class="live-dot">Updated hourly</div>
-    </div>
-
-    <div class="scroll-content">
-      <div class="section-head">
-        <div class="section-title">Latest Articles</div>
-        <div class="section-sub">Refreshed every 60 minutes</div>
-      </div>
-
-      <div class="article-card">
-        <div class="article-tag">Macro</div>
-        <div class="article-title">DXY Weakness Confirms Risk-On Rotation Into Crypto Assets</div>
-        <div class="article-excerpt">Dollar index continues its descent from multi-month highs, historically correlated with capital rotation toward higher-beta risk assets including crypto and emerging markets.</div>
-        <div class="article-footer">
-          <span>14 Apr 2025 · 09:00 UTC</span>
-          <span>4 min read</span>
-        </div>
-      </div>
-
-      <div class="article-card">
-        <div class="article-tag">Crypto</div>
-        <div class="article-title">Bitcoin Order Flow Signals Institutional Accumulation Below $68K</div>
-        <div class="article-excerpt">Large limit orders detected between $66,800 and $67,400 on spot exchanges suggest coordinated accumulation from larger market participants ahead of halving.</div>
-        <div class="article-footer">
-          <span>14 Apr 2025 · 08:00 UTC</span>
-          <span>5 min read</span>
-        </div>
-      </div>
-
-      <div class="article-card">
-        <div class="article-tag">Equities</div>
-        <div class="article-title">NASDAQ Maintains Support — Tech Earnings Season Preview</div>
-        <div class="article-excerpt">NDX held its 20-week EMA for the third consecutive week. Options market positioning suggests relatively muted volatility expectations heading into earnings season.</div>
-        <div class="article-footer">
-          <span>14 Apr 2025 · 07:00 UTC</span>
-          <span>3 min read</span>
-        </div>
-      </div>
-
-      <div class="article-card">
-        <div class="article-tag">Metals</div>
-        <div class="article-title">Gold Breaks Key Structure — Next Resistance at $2,380</div>
-        <div class="article-excerpt">XAUUSD cleared the $2,340 resistance zone on strong volume. Structure shift confirmed on the 4H chart with the next significant supply zone sitting near $2,380.</div>
-        <div class="article-footer">
-          <span>14 Apr 2025 · 06:00 UTC</span>
-          <span>3 min read</span>
-        </div>
-      </div>
-
-      <div class="disclaimer">
-        Articles are generated by AI and are intended for informational purposes only.
-        They do not constitute investment advice or solicitation.
+  <div class="sc">
+    <div class="section-head"><div class="sh-title">Signals</div><div class="sh-sub">Real-time delivery via bot</div></div>
+    <div style="padding:0 14px 12px;">
+      <div class="seg" id="sig-seg">
+        <button class="sb active" onclick="setSeg(this,'sig-seg')">All</button>
+        <button class="sb" onclick="setSeg(this,'sig-seg')">Crypto</button>
+        <button class="sb" onclick="setSeg(this,'sig-seg')">Stocks</button>
+        <button class="sb" onclick="setSeg(this,'sig-seg')">FX / Metals</button>
       </div>
     </div>
+    <div id="signals-container">
+      <!-- Populated from Firebase / JSON -->
+      <!-- Demo cards shown when no live data -->
+      <div class="sig">
+        <div class="sig-type">Order Flow · Futures</div>
+        <div class="sig-head">
+          <div><div class="sig-sym">BTC / USDT</div><div class="sig-meta">Crypto · Perpetual · 4H</div></div>
+          <div class="dir long">LONG</div>
+        </div>
+        <div class="sig-div"></div>
+        <div class="sig-row"><span class="srl">Entry</span><span class="srv e">$67,240 · Market</span></div>
+        <div class="sig-row"><span class="srl">Take Profit</span><span class="srv tp">$69,800</span></div>
+        <div class="sig-row"><span class="srl">Stop Loss</span><span class="srv sl">$65,900</span></div>
+        <div class="sig-row"><span class="srl">R / R</span><span class="srv">1 : 1.9</span></div>
+        <div class="sig-time">Issued · 14 Apr 2025, 09:42 UTC</div>
+      </div>
+      <div class="sig">
+        <div class="sig-type">Order Flow · Spot</div>
+        <div class="sig-head">
+          <div><div class="sig-sym">ETH / USDT</div><div class="sig-meta">Crypto · Spot · 1H</div></div>
+          <div class="dir short">SPOT SELL</div>
+        </div>
+        <div class="sig-div"></div>
+        <div class="sig-row"><span class="srl">Entry</span><span class="srv e">$3,184 · Market</span></div>
+        <div class="sig-row"><span class="srl">Take Profit</span><span class="srv tp">$3,020</span></div>
+        <div class="sig-row"><span class="srl">Stop Loss</span><span class="srv sl">$3,260</span></div>
+        <div class="sig-row"><span class="srl">R / R</span><span class="srv">1 : 2.2</span></div>
+        <div class="sig-time">Issued · 14 Apr 2025, 08:15 UTC</div>
+      </div>
+      <div class="sig">
+        <div class="sig-type">Money Flow · Spot</div>
+        <div class="sig-head">
+          <div><div class="sig-sym">XAU / USD</div><div class="sig-meta">Metals · Spot · Daily</div></div>
+          <div class="dir long">SPOT BUY</div>
+        </div>
+        <div class="sig-div"></div>
+        <div class="sig-row"><span class="srl">Entry</span><span class="srv e">$2,341 · Limit</span></div>
+        <div class="sig-row"><span class="srl">Take Profit</span><span class="srv tp">$2,410</span></div>
+        <div class="sig-row"><span class="srl">Stop Loss</span><span class="srv sl">$2,305</span></div>
+        <div class="sig-row"><span class="srl">R / R</span><span class="srv">1 : 1.9</span></div>
+        <div class="sig-time">Issued · 14 Apr 2025, 06:00 UTC</div>
+      </div>
+      <!-- Index confluence card — mirrors _confluence_card_no_rr: NO TP/SL/RR -->
+      <div class="sig">
+        <div class="sig-type">Index Confluence Signal</div>
+        <div class="sig-head">
+          <div><div class="sig-sym">EUR / USD</div><div class="sig-meta">FX · Spot · 4H</div></div>
+          <div class="dir long">LONG</div>
+        </div>
+        <div class="sig-div"></div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;">A macro index scan confirmed the LONG direction across multiple market indexes before this signal was issued. Only signals where more indexes agree than disagree are delivered.</div>
+        <div class="sig-row"><span class="srl">Entry</span><span class="srv e">1.0842 · Market</span></div>
+        <div class="sig-row"><span class="srl">Index Votes</span><span class="srv" style="font-size:12px;">5 For · 1 Against · 2 Neutral</span></div>
+        <div class="sig-row"><span class="srl">Strength</span><span class="srv" style="color:var(--gold);">Strong</span></div>
+        <div class="sig-time">Issued · 14 Apr 2025, 05:30 UTC</div>
+      </div>
+    </div>
+    <div class="disc">Signals are generated by AI analysis of live market data. They do not constitute financial advice. Always conduct your own analysis before placing any trade.</div>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════════════════
-       SCREEN: SETUP — BOT & EXCHANGE
-  ═══════════════════════════════════════════════ -->
-  <div class="screen" id="screen-setup">
-    <div class="topbar">
-      <div>
-        <div class="topbar-logo">Setup</div>
-        <div class="topbar-sub">Connect your account</div>
-      </div>
-    </div>
-
-    <div class="scroll-content">
-
-      <!-- Steps overview -->
-      <div class="section-head">
-        <div class="section-title">Getting Started</div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">1</div>
-        <div>
-          <div class="step-title">Select a Plan</div>
-          <div class="step-desc">Choose the tier that suits your trading needs. You can upgrade at any time.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>
-          <div class="step-title">Connect Your Exchange</div>
-          <div class="step-desc">Provide read-only API credentials from your exchange. We never execute trades on your behalf.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>
-          <div class="step-title">Link Your Telegram Bot</div>
-          <div class="step-desc">Paste your Telegram bot token to receive signals directly in your private channel.</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">4</div>
-        <div>
-          <div class="step-title">Choose Signal Preferences</div>
-          <div class="step-desc">Select signal type, market type (spot or futures), and notification frequency.</div>
-        </div>
-      </div>
-
-      <!-- Choose exchange -->
-      <div class="section-head" style="padding-top:20px;">
-        <div class="section-title">Exchange</div>
-      </div>
-
-      <div class="exchange-grid">
-        <div class="exchange-btn selected" onclick="selectExchange(this)">
-          <div class="exchange-btn-name">Binance</div>
-          <div class="exchange-btn-sub">Spot &amp; Futures</div>
-        </div>
-        <div class="exchange-btn" onclick="selectExchange(this)">
-          <div class="exchange-btn-name">Bybit</div>
-          <div class="exchange-btn-sub">Spot &amp; Futures</div>
-        </div>
-        <div class="exchange-btn" onclick="selectExchange(this)">
-          <div class="exchange-btn-name">Bitget</div>
-          <div class="exchange-btn-sub">Spot &amp; Futures</div>
-        </div>
-        <div class="exchange-btn" onclick="selectExchange(this)">
-          <div class="exchange-btn-name">OKX</div>
-          <div class="exchange-btn-sub">Spot &amp; Futures</div>
-        </div>
-      </div>
-
-      <!-- API credentials -->
-      <div class="card" style="margin-top:4px;">
-        <div class="card-label">Exchange API Credentials</div>
-        <div class="input-wrap" style="margin-bottom:12px;">
-          <label class="input-label">API Key</label>
-          <input class="input" type="text" placeholder="Enter your API key">
-        </div>
-        <div class="input-wrap" style="margin-bottom:0;">
-          <label class="input-label">API Secret</label>
-          <input class="input" type="password" placeholder="Enter your API secret">
-        </div>
-        <div class="text-muted mt-8" style="font-size:11px; line-height:1.5;">
-          Use read-only permissions only. Do not enable withdrawal or trading permissions.
-        </div>
-      </div>
-
-      <!-- Telegram bot -->
-      <div class="card">
-        <div class="card-label">Telegram Delivery</div>
-        <div class="input-wrap" style="margin-bottom:0;">
-          <label class="input-label">Bot Token</label>
-          <input class="input" type="text" placeholder="Paste your bot token from @BotFather">
-        </div>
-        <div class="text-muted mt-8" style="font-size:11px; line-height:1.5;">
-          Create a bot via @BotFather on Telegram and paste the token here.
-          Signals will be delivered to your private bot.
-        </div>
-      </div>
-
-      <!-- Signal preferences -->
-      <div class="card">
-        <div class="card-label">Signal Preferences</div>
-
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-label">Order Flow Signals</div>
-            <div class="toggle-desc">Signals based on real-time order book pressure</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" checked onchange="handleToggle(this)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-label">Money Flow Signals</div>
-            <div class="toggle-desc">Signals based on capital flow and volume analysis</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" checked onchange="handleToggle(this)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-label">Spot Market</div>
-            <div class="toggle-desc">Receive signals for spot trading</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" checked onchange="handleToggle(this)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-label">Futures Market</div>
-            <div class="toggle-desc">Receive signals for perpetual futures</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" onchange="handleToggle(this)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-label">Index Confluence Alerts</div>
-            <div class="toggle-desc">Receive confluence shift notifications</div>
-          </div>
-          <label class="toggle">
-            <input type="checkbox" checked onchange="handleToggle(this)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-      </div>
-
-      <div style="padding: 4px 16px 16px;">
-        <button class="btn btn-gold">Save Settings</button>
-      </div>
-
-      <div class="disclaimer">
-        Your API credentials are encrypted at rest and are never used to place trades.
-        We only read position and market data for signal generation purposes.
-      </div>
-    </div>
+<!-- ═══════════════════════════════════════
+     CONFLUENCE
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-confluence">
+  <div class="topbar">
+    <div><div class="tb-logo">30×Tech Research</div><div class="tb-sub">Index Confluence</div></div>
+    <div class="live-dot">Live</div>
   </div>
-
-  <!-- ══════════════════════════════════════════════
-       SCREEN: PLANS
-  ═══════════════════════════════════════════════ -->
-  <div class="screen" id="screen-plans">
-    <div class="topbar">
-      <div>
-        <div class="topbar-logo">Plans</div>
-        <div class="topbar-sub">Choose your access level</div>
-      </div>
-    </div>
-
-    <div class="scroll-content">
-      <div class="section-head">
-        <div class="section-title">Membership Plans</div>
-        <div class="section-sub">Cancel anytime</div>
-      </div>
-
-      <!-- Free -->
-      <div class="plan-card">
-        <div class="plan-name">Free</div>
-        <div class="plan-price">$0</div>
-        <div class="plan-period">No credit card required</div>
-        <ul class="plan-features">
-          <li class="plan-feature"><span class="plan-feature-icon">›</span>One signal per day</li>
-          <li class="plan-feature"><span class="plan-feature-icon">›</span>Public market articles</li>
-          <li class="plan-feature"><span class="plan-feature-icon">›</span>Basic index overview</li>
-        </ul>
-        <button class="btn btn-outline">Current Plan</button>
-      </div>
-
-      <!-- Order Flow -->
-      <div class="plan-card featured">
-        <div class="plan-name">Order Flow</div>
-        <div class="plan-price">$49</div>
-        <div class="plan-period">per month · billed monthly</div>
-        <ul class="plan-features">
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>All order flow signals — all markets</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Spot and futures signal delivery</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Full index confluence dashboard</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Hourly AI market articles</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Telegram bot integration</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Exchange API connection</li>
-        </ul>
-        <button class="btn btn-gold">Subscribe — $49 / mo</button>
-      </div>
-
-      <!-- Money Flow -->
-      <div class="plan-card">
-        <div class="plan-name">Money Flow</div>
-        <div class="plan-price">$89</div>
-        <div class="plan-period">per month · billed monthly</div>
-        <ul class="plan-features">
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Everything in Order Flow</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Money flow and capital rotation signals</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Cross-asset correlation alerts</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Priority Telegram delivery</li>
-          <li class="plan-feature"><span class="plan-feature-icon text-gold">›</span>Dedicated support channel</li>
-        </ul>
-        <button class="btn btn-gold">Subscribe — $89 / mo</button>
-      </div>
-
-      <div class="disclaimer">
-        Subscriptions auto-renew monthly. Cancel at any time from your account settings.
-        All payments are processed securely. Prices shown in USD.
-        Membership does not guarantee profitable trading outcomes.
-      </div>
-    </div>
+  <div class="sync-bar">
+    <div class="sync-indicator"><div class="sync-dot" id="conf-sync-dot"></div><span id="conf-sync-txt">Synced with server</span></div>
+    <span id="conf-sync-time">—</span>
   </div>
-
-  <!-- ══════════════════════════════════════════════
-       SCREEN: PROFILE
-  ═══════════════════════════════════════════════ -->
-  <div class="screen" id="screen-profile">
-    <div class="topbar">
-      <div>
-        <div class="topbar-logo">Account</div>
-        <div class="topbar-sub">Your profile</div>
-      </div>
+  <div class="sc">
+    <div class="section-head"><div class="sh-title">Index Confluence</div><div class="sh-sub">4H · 1D · 1W · 1M</div></div>
+    <div class="notice" id="conf-vote-summary">Index votes: 14 confirming · 4 against · 3 neutral — Strength: Strong</div>
+    <div class="card">
+      <div class="card-lbl">Crypto</div>
+      <div class="idx-row"><span class="idx-name">CMC20</span><span class="idx-tf">4H</span><div class="ibw"><div class="ib b" style="width:74%"></div></div><span class="idx-v" style="color:var(--green)">74</span><span class="idx-vote">5 For · 2 Ag.</span></div>
+      <div class="idx-row"><span class="idx-name">BTC Dom.</span><span class="idx-tf">1D</span><div class="ibw"><div class="ib b" style="width:61%"></div></div><span class="idx-v" style="color:var(--green)">61</span><span class="idx-vote">4 For · 2 Ag.</span></div>
+      <div class="idx-row"><span class="idx-name">ETH / BTC</span><span class="idx-tf">1D</span><div class="ibw"><div class="ib r" style="width:38%"></div></div><span class="idx-v" style="color:var(--red)">38</span><span class="idx-vote">1 For · 5 Ag.</span></div>
     </div>
-
-    <div class="scroll-content">
-      <div style="padding: 24px 16px 12px; text-align:center;">
-        <div class="profile-avatar">J</div>
-        <div class="profile-name">John Trader</div>
-        <div class="profile-plan">Order Flow Plan</div>
-      </div>
-
-      <div class="card card-sm">
-        <div class="menu-item" onclick="">
-          <div class="menu-item-left">
-            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-            Personal Details
-          </div>
-          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-        <div class="menu-item" onclick="showScreen('screen-plans')">
-          <div class="menu-item-left">
-            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-            Subscription &amp; Billing
-          </div>
-          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-        <div class="menu-item" onclick="showScreen('screen-setup')">
-          <div class="menu-item-left">
-            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-            Bot &amp; Exchange Settings
-          </div>
-          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-        <div class="menu-item" onclick="">
-          <div class="menu-item-left">
-            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
-            Notification Preferences
-          </div>
-          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-        <div class="menu-item" onclick="">
-          <div class="menu-item-left">
-            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Security
-          </div>
-          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-        <div class="menu-item" onclick="">
-          <div class="menu-item-left">
-            <svg class="menu-item-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-            Help &amp; Support
-          </div>
-          <svg class="menu-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-      </div>
-
-      <div style="padding: 8px 16px 0;">
-        <button class="btn btn-outline" style="color: var(--red); border-color: rgba(231,76,60,.3);" onclick="showScreen('screen-auth')">
-          Sign Out
-        </button>
-      </div>
-
-      <div class="disclaimer" style="margin-top:16px;">
-        30xTech Research · Version 1.0.0<br>
-        © 2025 30xTech Research. All rights reserved.
-      </div>
+    <div class="card">
+      <div class="card-lbl">Equities — SPX · NDX · RUT · XLF · XLE</div>
+      <div class="idx-row"><span class="idx-name">S&amp;P 500</span><span class="idx-tf">4H</span><div class="ibw"><div class="ib b" style="width:68%"></div></div><span class="idx-v" style="color:var(--green)">68</span><span class="idx-vote">5 For · 2 Ag.</span></div>
+      <div class="idx-row"><span class="idx-name">NASDAQ</span><span class="idx-tf">4H</span><div class="ibw"><div class="ib b" style="width:71%"></div></div><span class="idx-v" style="color:var(--green)">71</span><span class="idx-vote">6 For · 1 Ag.</span></div>
+      <div class="idx-row"><span class="idx-name">Russell</span><span class="idx-tf">1D</span><div class="ibw"><div class="ib r" style="width:44%"></div></div><span class="idx-v" style="color:var(--red)">44</span><span class="idx-vote">2 For · 4 Ag.</span></div>
     </div>
+    <div class="card">
+      <div class="card-lbl">Macro — DXY · BXY · TNX · TLT</div>
+      <div class="idx-row"><span class="idx-name">DXY</span><span class="idx-tf">1D</span><div class="ibw"><div class="ib r" style="width:35%"></div></div><span class="idx-v" style="color:var(--red)">35</span><span class="idx-vote">1 For · 6 Ag.</span></div>
+      <div class="idx-row"><span class="idx-name">10Y Yield</span><span class="idx-tf">1W</span><div class="ibw"><div class="ib b" style="width:58%"></div></div><span class="idx-v" style="color:var(--green)">58</span><span class="idx-vote">4 For · 3 Ag.</span></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Volatility &amp; Commodities — VIX · VVIX · GLD · USO · UNG</div>
+      <div class="idx-row"><span class="idx-name">VIX</span><span class="idx-tf">1D</span><div class="ibw"><div class="ib r" style="width:29%"></div></div><span class="idx-v" style="color:var(--red)">29</span><span class="idx-vote">1 For · 6 Ag.</span></div>
+      <div class="idx-row"><span class="idx-name">Gold</span><span class="idx-tf">4H</span><div class="ibw"><div class="ib b" style="width:77%"></div></div><span class="idx-v" style="color:var(--green)">77</span><span class="idx-vote">6 For · 1 Ag.</span></div>
+    </div>
+    <div class="disc">Confluence scores derived from RSI and MACD across 4H · 1D · 1W · 1M timeframes. Scores above 50 indicate bullish bias. Only signals with at least one confirming index vote and more indexes agreeing than disagreeing are delivered.</div>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════════════════
-       BOTTOM NAV (hidden on auth)
-  ═══════════════════════════════════════════════ -->
-  <nav class="nav" id="bottom-nav" style="display:none;">
-    <button class="nav-item active" id="nav-home" onclick="navigate('home')">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      Signals
-    </button>
-    <button class="nav-item" id="nav-confluence" onclick="navigate('confluence')">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path d="M3 3v18h18"/><path d="M7 16l4-8 4 6 4-4"/>
-      </svg>
-      Confluence
-    </button>
-    <button class="nav-item" id="nav-articles" onclick="navigate('articles')">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-      </svg>
-      Research
-    </button>
-    <button class="nav-item" id="nav-setup" onclick="navigate('setup')">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-      </svg>
-      Setup
-    </button>
-    <button class="nav-item" id="nav-profile" onclick="navigate('profile')">
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-      </svg>
-      Account
-    </button>
-  </nav>
+<!-- ═══════════════════════════════════════
+     MARKET UPDATES (Articles)
+     Format mirrors _build_template_article subscriber card
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-articles">
+  <div class="topbar">
+    <div><div class="tb-logo">30×Tech Research</div><div class="tb-sub">Market Updates</div></div>
+    <div class="live-dot">Every 60 min</div>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-indicator"><div class="sync-dot" id="art-sync-dot"></div><span id="art-sync-txt">Synced with server</span></div>
+    <span id="art-sync-time">—</span>
+  </div>
+  <div class="sc">
+    <div class="section-head"><div class="sh-title">Market Update</div><div class="sh-sub">Verified live data · updated every 60 min</div></div>
+
+    <!-- Market update card — mirrors subscriber_card from _build_template_article -->
+    <div class="art" id="art-latest">
+      <div class="art-time" id="art-ts">14 Apr 2025 · 09:00 UTC</div>
+
+      <!-- Per-category bias — matches cat_bias structure in software -->
+      <div class="art-bias-row">
+        <span class="art-cat">Crypto</span>
+        <span class="art-bias bull">Bullish</span>
+      </div>
+      <div class="art-bias-row">
+        <span class="art-cat">Stocks</span>
+        <span class="art-bias bull">Bullish</span>
+      </div>
+      <div class="art-bias-row">
+        <span class="art-cat">FX</span>
+        <span class="art-bias neutral">Neutral</span>
+      </div>
+      <div class="art-bias-row">
+        <span class="art-cat">Metals</span>
+        <span class="art-bias bull">Bullish</span>
+      </div>
+      <div class="art-bias-row">
+        <span class="art-cat">Oil &amp; Gas</span>
+        <span class="art-bias bear">Bearish</span>
+      </div>
+
+      <!-- Live prices section — scraped/live from software -->
+      <div class="art-prices">
+        <div class="card-lbl" style="margin-bottom:8px;">Live Prices</div>
+        <div class="art-px-row"><span class="art-px-sym">BTC</span><span class="art-px-val">$67,240</span></div>
+        <div class="art-px-row"><span class="art-px-sym">ETH</span><span class="art-px-val">$3,184</span></div>
+        <div class="art-px-row"><span class="art-px-sym">S&amp;P 500</span><span class="art-px-val">$5,210</span></div>
+        <div class="art-px-row"><span class="art-px-sym">NASDAQ</span><span class="art-px-val">$18,340</span></div>
+        <div class="art-px-row"><span class="art-px-sym">EUR/USD</span><span class="art-px-val">1.0842</span></div>
+        <div class="art-px-row"><span class="art-px-sym">GBP/USD</span><span class="art-px-val">1.2630</span></div>
+        <div class="art-px-row"><span class="art-px-sym">Gold</span><span class="art-px-val">$2,341</span></div>
+        <div class="art-px-row"><span class="art-px-sym">Oil (WTI)</span><span class="art-px-val">$82.40</span></div>
+      </div>
+
+      <!-- Context note matching software template -->
+      <div class="art-note">
+        The majority of key market indexes are trending upward. Watch for pullbacks to key support levels as potential entries.<br><br>
+        <span style="color:var(--amber);">Watch:</span> DXY weakness supporting risk assets. Monitor Fed commentary for reversal signals.<br><br>
+        <span style="font-size:10px;">30×Tech Research · Not financial advice</span>
+      </div>
+    </div>
+
+    <!-- News headlines (scraped via CryptoPanic / Finnhub / ForexFactory) -->
+    <div class="section-head" style="padding-top:6px;"><div class="sh-title">Headlines</div><div class="sh-sub">Scraped from news sources</div></div>
+
+    <div class="art" style="padding:14px 16px;">
+      <div class="art-time">Macro · CryptoPanic</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;">DXY Weakness Confirms Risk-On Rotation Into Crypto Assets</div>
+      <div style="font-size:12px;color:var(--muted);">Dollar index continues its descent from multi-month highs, historically correlated with capital rotation toward higher-beta risk assets.</div>
+    </div>
+
+    <div class="art" style="padding:14px 16px;">
+      <div class="art-time">Crypto · CryptoPanic</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;">Bitcoin Order Flow Signals Institutional Accumulation Below $68K</div>
+      <div style="font-size:12px;color:var(--muted);">Large limit orders detected between $66,800 and $67,400 on spot exchanges ahead of halving.</div>
+    </div>
+
+    <div class="art" style="padding:14px 16px;">
+      <div class="art-time">Equities · Finnhub</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;">NASDAQ Holds Support — Tech Earnings Season Preview</div>
+      <div style="font-size:12px;color:var(--muted);">NDX held its 20-week EMA for the third consecutive week. Options positioning suggests muted volatility expectations.</div>
+    </div>
+
+    <div class="art" style="padding:14px 16px;">
+      <div class="art-time">FX / Metals · ForexFactory</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;">Gold Breaks Key Structure — Next Resistance at $2,380</div>
+      <div style="font-size:12px;color:var(--muted);">XAUUSD cleared $2,340 resistance on strong volume. Structure shift confirmed on 4H chart.</div>
+    </div>
+
+    <div class="disc">Market updates use verified live price data and index confluence from the 30×Tech Research engine. Headlines are scraped from CryptoPanic, Finnhub, and ForexFactory. Not financial advice.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SETUP — Telegram UID + Chat ID + Exchange API
+     Follows exact /register → /myid → /ping flow from 30x.py
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-setup">
+  <div class="topbar"><div><div class="tb-logo">30×Tech Research</div><div class="tb-sub">Setup</div></div></div>
+  <div class="sc">
+    <div class="section-head"><div class="sh-title">Getting Started</div></div>
+
+    <div class="step"><div class="sn">1</div><div><div class="st">Select a Plan</div><div class="sd">Choose a subscription from the Plans tab. After payment, proceed to step 2.</div></div></div>
+    <div class="step"><div class="sn">2</div><div><div class="st">Register with the Bot</div><div class="sd">Open your assigned Telegram bot and send the command <strong>/register</strong>. This creates your account. The bot will reply with your Telegram User ID.</div></div></div>
+    <div class="step"><div class="sn">3</div><div><div class="st">Find Your Telegram User ID and Chat ID</div><div class="sd">Send <strong>/myid</strong> to the bot to retrieve your User ID and Chat ID. Enter both below so the app can link your account.</div></div></div>
+    <div class="step"><div class="sn">4</div><div><div class="st">Notify Admin After Payment</div><div class="sd">After completing payment, send <strong>/ping</strong> to the bot with your payment reference. The admin will activate your plan.</div></div></div>
+    <div class="step"><div class="sn">5</div><div><div class="st">Connect Your Exchange (Optional)</div><div class="sd">Provide read-only API credentials if you want live price tracking in-app. We never execute trades on your behalf.</div></div></div>
+
+    <!-- Telegram connection -->
+    <div class="section-head" style="padding-top:18px;"><div class="sh-title">Telegram Account</div></div>
+    <div class="card">
+      <div class="card-lbl">Your Telegram Details</div>
+      <div class="iw"><label class="il">Telegram User ID</label><input class="inp" type="text" placeholder="e.g. 123456789 (from /myid command)" id="tg-uid"></div>
+      <div class="iw" style="margin-bottom:6px;"><label class="il">Telegram Chat ID</label><input class="inp" type="text" placeholder="e.g. -100123456789 (from /myid command)" id="tg-chatid"></div>
+      <div class="info" style="margin:8px 0 0;">Send <strong>/myid</strong> to your bot on Telegram to retrieve both values. Your User ID is your personal numeric identifier. Your Chat ID is the ID of the channel or group where you want to receive signals.</div>
+    </div>
+
+    <!-- Exchange -->
+    <div class="section-head" style="padding-top:6px;"><div class="sh-title">Exchange</div></div>
+    <div class="eg">
+      <div class="eb sel" onclick="selEx(this)"><div class="en">Binance</div><div class="es">Spot &amp; Futures</div></div>
+      <div class="eb" onclick="selEx(this)"><div class="en">Bybit</div><div class="es">Spot &amp; Futures</div></div>
+      <div class="eb" onclick="selEx(this)"><div class="en">Bitget</div><div class="es">Spot &amp; Futures</div></div>
+      <div class="eb" onclick="selEx(this)"><div class="en">OKX</div><div class="es">Spot &amp; Futures</div></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Exchange API Credentials</div>
+      <div class="iw"><label class="il">API Key</label><input class="inp" type="text" placeholder="Enter your read-only API key" id="api-key"></div>
+      <div class="iw" style="margin-bottom:6px;"><label class="il">API Secret</label><input class="inp" type="password" placeholder="Enter your API secret" id="api-secret"></div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.5;">Use read-only permissions only. Do not enable withdrawal or trading permissions on your API key.</div>
+    </div>
+
+    <!-- Market type preference -->
+    <div class="card">
+      <div class="card-lbl">Signal Delivery Preference</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px;">
+        <button class="btn btn-gold" style="flex:1;padding:10px;" id="pref-spot" onclick="setPref('spot')">Spot</button>
+        <button class="btn btn-ghost" style="flex:1;padding:10px;" id="pref-futures" onclick="setPref('futures')">Futures</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.5;">Choose whether you want spot or futures signals delivered to your Telegram bot. This matches the <strong>ct_market_type</strong> setting in the software.</div>
+    </div>
+
+    <div style="padding:4px 14px 14px;"><button class="btn btn-gold" onclick="saveSetup()">Save &amp; Sync</button></div>
+    <div id="setup-status" style="text-align:center;font-size:12px;color:var(--muted);padding:0 14px 8px;min-height:18px;"></div>
+    <div class="disc">Your API credentials are encrypted at rest and are never used to place trades. Telegram IDs are used only to deliver your signals.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PLANS — exact data from 30x.py PLANS dict
+     All 5 plans with real prices + PayPal links
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-plans">
+  <div class="topbar"><div><div class="tb-logo">30×Tech Research</div><div class="tb-sub">Membership Plans</div></div></div>
+  <div class="sc">
+    <div class="section-head"><div class="sh-title">Choose Your Plan</div><div class="sh-sub">Cancel monthly plans anytime</div></div>
+
+    <div class="notice">After payment, open your Telegram bot and send <strong>/ping</strong> with your payment reference. The admin will activate your plan. Questions? Contact <strong>@ThirtyxSaas</strong></div>
+
+    <!-- Plan 1: Index + Articles — £49/mo — bot1 + bot4 -->
+    <div class="plan">
+      <div class="plan-type">Monthly Subscription</div>
+      <div class="plan-price">£49<span style="font-size:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;"> / mo</span></div>
+      <div class="plan-name">Index + Articles</div>
+      <div class="plan-period">Billed monthly · cancel anytime</div>
+      <ul class="pf">
+        <li class="pfi"><span class="pfd">›</span>Live index confluence dashboard</li>
+        <li class="pfi"><span class="pfd">›</span>Market updates every 60 minutes</li>
+        <li class="pfi"><span class="pfd">›</span>Multi-timeframe RSI · MACD · Ichimoku</li>
+        <li class="pfi"><span class="pfd">›</span>Telegram bot delivery</li>
+      </ul>
+      <div class="pay-row">
+        <a href="https://www.paypal.com/ncp/payment/HJZEWPNV4GYAW" target="_blank" class="pbtn pbtn-pp">Pay via PayPal</a>
+        <button class="pbtn pbtn-ps">Pay via Card</button>
+      </div>
+    </div>
+
+    <!-- Plan 2: Signals Monthly — £149/mo — bot2 — FEATURED -->
+    <div class="plan hot">
+      <div class="plan-badge">Popular</div>
+      <div class="plan-type">Monthly Subscription</div>
+      <div class="plan-price">£149<span style="font-size:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;"> / mo</span></div>
+      <div class="plan-name">Signals</div>
+      <div class="plan-period">Billed monthly · cancel anytime</div>
+      <ul class="pf">
+        <li class="pfi"><span class="pfd" style="color:var(--gold)">›</span>All signals — Crypto · Stocks · FX · Metals</li>
+        <li class="pfi"><span class="pfd" style="color:var(--gold)">›</span>Order flow and money flow signal analysis</li>
+        <li class="pfi"><span class="pfd" style="color:var(--gold)">›</span>Spot and futures signal delivery</li>
+        <li class="pfi"><span class="pfd" style="color:var(--gold)">›</span>Entry · Take Profit · Stop Loss · R/R on every signal</li>
+        <li class="pfi"><span class="pfd" style="color:var(--gold)">›</span>Telegram bot integration</li>
+        <li class="pfi"><span class="pfd" style="color:var(--gold)">›</span>Exchange API connection</li>
+      </ul>
+      <div class="pay-row">
+        <a href="https://www.paypal.com/ncp/payment/LTR3J533Y5ERS" target="_blank" class="pbtn pbtn-pp">Pay via PayPal</a>
+        <button class="pbtn pbtn-ps">Pay via Card</button>
+      </div>
+    </div>
+
+    <!-- Plan 3: Full Premium Monthly — £299/mo — bot1 + bot2 + bot4 -->
+    <div class="plan">
+      <div class="plan-type">Monthly Subscription</div>
+      <div class="plan-price">£299<span style="font-size:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400;"> / mo</span></div>
+      <div class="plan-name">Full Premium</div>
+      <div class="plan-period">Billed monthly · cancel anytime</div>
+      <ul class="pf">
+        <li class="pfi"><span class="pfd">›</span>Everything in Signals plan</li>
+        <li class="pfi"><span class="pfd">›</span>Full index confluence dashboard</li>
+        <li class="pfi"><span class="pfd">›</span>Market updates every 60 minutes</li>
+        <li class="pfi"><span class="pfd">›</span>All three bots — Index · Signals · Articles</li>
+        <li class="pfi"><span class="pfd">›</span>Priority Telegram delivery</li>
+      </ul>
+      <div class="pay-row">
+        <a href="https://www.paypal.com/ncp/payment/WVBLCRQ5BSF38" target="_blank" class="pbtn pbtn-pp">Pay via PayPal</a>
+        <button class="pbtn pbtn-ps">Pay via Card</button>
+      </div>
+    </div>
+
+    <!-- Plan 4: Articles Only — £450 one-time — bot4 -->
+    <div class="plan">
+      <div class="plan-type">One-time Payment · Lifetime</div>
+      <div class="plan-price">£450</div>
+      <div class="plan-name">Articles Only</div>
+      <div class="plan-period">Single payment · permanent access · no recurring charge</div>
+      <ul class="pf">
+        <li class="pfi"><span class="pfd">›</span>Market updates every 60 minutes — permanent</li>
+        <li class="pfi"><span class="pfd">›</span>Crypto · Stocks · FX · Metals coverage</li>
+        <li class="pfi"><span class="pfd">›</span>Live price data in every update</li>
+        <li class="pfi"><span class="pfd">›</span>Telegram bot delivery</li>
+      </ul>
+      <div class="pay-row">
+        <a href="https://www.paypal.com/ncp/payment/TQB2KETT5T28Q" target="_blank" class="pbtn pbtn-pp">Pay via PayPal</a>
+        <button class="pbtn pbtn-ps">Pay via Card</button>
+      </div>
+    </div>
+
+    <!-- Plan 5: All Bots — £1,420 one-time — bot1 + bot2 + bot4 -->
+    <div class="plan">
+      <div class="plan-type">One-time Payment · Lifetime</div>
+      <div class="plan-price">£1,420</div>
+      <div class="plan-name">All Bots</div>
+      <div class="plan-period">Single payment · all bots permanently unlocked</div>
+      <ul class="pf">
+        <li class="pfi"><span class="pfd">›</span>All signals · all markets · permanent</li>
+        <li class="pfi"><span class="pfd">›</span>Full index confluence — permanent</li>
+        <li class="pfi"><span class="pfd">›</span>Market updates every 60 minutes — permanent</li>
+        <li class="pfi"><span class="pfd">›</span>All future signal updates included</li>
+        <li class="pfi"><span class="pfd">›</span>All three bots activated</li>
+      </ul>
+      <div class="pay-row">
+        <a href="https://www.paypal.com/ncp/payment/ADP4U9NME53NU" target="_blank" class="pbtn pbtn-pp">Pay via PayPal</a>
+        <button class="pbtn pbtn-ps">Pay via Card</button>
+      </div>
+    </div>
+
+    <!-- Payment instructions -->
+    <div class="section-head" style="padding-top:6px;"><div class="sh-title">Payment Instructions</div></div>
+    <div class="card">
+      <div class="card-lbl">How to Complete Your Payment</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7;">
+        <div style="padding:5px 0;border-bottom:1px solid var(--border);">1. Select your plan and tap <strong>Pay via PayPal</strong> or <strong>Pay via Card</strong>.</div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--border);">2. Complete your payment and note your transaction reference.</div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--border);">3. Open your Telegram bot and send <strong>/register</strong> if you have not already done so.</div>
+        <div style="padding:5px 0;border-bottom:1px solid var(--border);">4. Send <strong>/ping</strong> to the bot with your transaction reference so the admin can verify and activate your plan.</div>
+        <div style="padding:5px 0;">5. The admin will activate your plan and you will begin receiving signals immediately.</div>
+      </div>
+    </div>
+
+    <!-- USDC option -->
+    <div class="card">
+      <div class="card-lbl">Pay via USDC (TRC-20)</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px;">Send USDC on the TRON network to the address below, then send <strong>/ping</strong> on Telegram with your transaction hash to activate your plan.</div>
+      <div class="usdc">TXyL39t6E8dzX9jTgvZUZREoXCu3rK94aP</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">Support: <strong>@ThirtyxSaas</strong></div>
+    </div>
+
+    <div class="disc">Monthly subscriptions auto-renew. Cancel at any time via your account. All payments processed securely. Prices shown in GBP. Membership does not guarantee profitable trading outcomes.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ACCOUNT
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-profile">
+  <div class="topbar"><div><div class="tb-logo">30×Tech Research</div><div class="tb-sub">Account</div></div></div>
+  <div class="sc">
+    <div style="padding:22px 14px 10px;text-align:center;">
+      <div class="pfa" id="pf-avatar">J</div>
+      <div class="pfn" id="pf-name">Loading...</div>
+      <div class="pfp" id="pf-plan">—</div>
+      <div id="pf-sync-status"></div>
+    </div>
+
+    <div class="card">
+      <div class="mi" onclick=""><div class="mil"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Personal Details</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="mi" onclick="navigate('plans')"><div class="mil"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Subscription &amp; Billing</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="mi" onclick="navigate('setup')"><div class="mil"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Bot &amp; Exchange Settings</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="mi" onclick=""><div class="mil"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Security</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><path d="M9 18l6-6-6-6"/></svg></div>
+      <div class="mi" onclick=""><div class="mil"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>Help &amp; Support</div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--muted)"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>
+
+    <!-- Data sync status -->
+    <div class="card" style="padding:14px 18px;">
+      <div class="card-lbl">Data Connection</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+          <span style="color:var(--muted);">Firebase</span>
+          <span class="status-badge" id="fb-status">Connected</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+          <span style="color:var(--muted);">Local Backup</span>
+          <span class="status-badge" id="json-status">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+          <span style="color:var(--muted);">Last Sync</span>
+          <span style="font-size:12px;color:var(--muted);" id="last-sync-time">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:6px 14px 0;"><button class="btn btn-outline" style="color:var(--red);border-color:rgba(231,76,60,.3);" onclick="signOut()">Sign Out</button></div>
+    <div class="disc" style="margin-top:16px;">30×Tech Research · Version 1.0.0<br>© 2025 30×Tech Research. All rights reserved.<br>Not financial advice — trade responsibly.</div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="nav" id="bottom-nav" style="display:none;">
+  <button class="ni active" id="nav-home" onclick="navigate('home')">
+    <svg class="ni-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Signals
+  </button>
+  <button class="ni" id="nav-confluence" onclick="navigate('confluence')">
+    <svg class="ni-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 6 4-4"/></svg>Confluence
+  </button>
+  <button class="ni" id="nav-articles" onclick="navigate('articles')">
+    <svg class="ni-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Updates
+  </button>
+  <button class="ni" id="nav-plans" onclick="navigate('plans')">
+    <svg class="ni-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Plans
+  </button>
+  <button class="ni" id="nav-profile" onclick="navigate('profile')">
+    <svg class="ni-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Account
+  </button>
+</nav>
 </div>
 
 <script>
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
+// ═══════════════════════════════════════════════════════
+//  STATE & CONFIG
+// ═══════════════════════════════════════════════════════
+const FIREBASE_BASE  = 'https://your-project-id.firebaseio.com'; // Replace with real Firebase URL
+const LOCAL_BACKUP   = 'app_data_backup';  // localStorage key for JSON backup
+const SIGNAL_ENDPOINT = `${FIREBASE_BASE}/signals.json`;
+const IDX_ENDPOINT    = `${FIREBASE_BASE}/idx_results.json`;
+const ARTICLE_ENDPOINT= `${FIREBASE_BASE}/market_updates.json`;
+const USER_ENDPOINT   = (uid) => `${FIREBASE_BASE}/admin_users/${uid}.json`;
 
-  function goHome() {
+let _currentUser = null;
+let _syncInterval = null;
+let _prefMarket = 'spot';
+let _authMode = 'login';
+
+// ═══════════════════════════════════════════════════════
+//  LOCAL BACKUP (JSON via localStorage — mirrors local JSON files in 30x.py)
+// ═══════════════════════════════════════════════════════
+function localSave(key, data) {
+  try { localStorage.setItem(LOCAL_BACKUP + '_' + key, JSON.stringify(data)); } catch(e) {}
+}
+function localLoad(key) {
+  try { const d = localStorage.getItem(LOCAL_BACKUP + '_' + key); return d ? JSON.parse(d) : null; } catch(e) { return null; }
+}
+
+// ═══════════════════════════════════════════════════════
+//  FIREBASE FETCH WITH LOCAL BACKUP FALLBACK
+//  Mirrors: local JSON first → Firebase overlay pattern in 30x.py
+// ═══════════════════════════════════════════════════════
+async function fetchWithFallback(url, cacheKey) {
+  // Step 1: Seed from local backup first
+  let localData = localLoad(cacheKey);
+  // Step 2: Try Firebase (authoritative — overlays local)
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (data) {
+        localSave(cacheKey, data); // update local backup
+        return { data, source: 'firebase' };
+      }
+    }
+  } catch(e) {}
+  // Step 3: Fall back to local backup
+  if (localData) return { data: localData, source: 'local' };
+  return { data: null, source: 'none' };
+}
+
+async function pushToFirebase(url, payload) {
+  // Step 1: Save to local backup immediately
+  const cacheKey = url.replace(FIREBASE_BASE, '').replace('.json','').replace(/\//g,'_');
+  localSave(cacheKey, payload);
+  // Step 2: Push to Firebase (best-effort)
+  try {
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000)
+    });
+    return res.ok;
+  } catch(e) {
+    return false; // local backup is current
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════
+function switchAuth(mode, btn) {
+  _authMode = mode;
+  document.querySelectorAll('.sb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('reg-extra').style.display = mode === 'register' ? 'block' : 'none';
+  document.getElementById('auth-lbl').textContent = mode === 'register' ? 'Create Account' : 'Continue';
+}
+
+async function authAction() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pw    = document.getElementById('auth-pw').value;
+  const st    = document.getElementById('auth-status');
+  if (!email || !pw) { st.textContent = 'Please fill in all fields.'; return; }
+  st.textContent = 'Connecting...';
+  // Simulate auth — in production wire to Firebase Auth
+  await new Promise(r => setTimeout(r, 800));
+  _currentUser = { email, uid: 'uid_' + email.replace(/[^a-z0-9]/gi,''), name: email.split('@')[0], plan: 'Signals Plan', role: 'user' };
+  localSave('user', _currentUser);
+  st.textContent = '';
+  goHome();
+}
+
+function signOut() {
+  _currentUser = null;
+  if (_syncInterval) { clearInterval(_syncInterval); _syncInterval = null; }
+  showScreen('screen-auth');
+  document.getElementById('bottom-nav').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════
+//  DATA SYNC — signals, confluence, articles from Firebase
+// ═══════════════════════════════════════════════════════
+function setSyncStatus(dotId, txtId, timeId, source, time) {
+  const dot = document.getElementById(dotId);
+  const txt = document.getElementById(txtId);
+  const tim = document.getElementById(timeId);
+  if (!dot) return;
+  if (source === 'firebase') { dot.className = 'sync-dot'; txt.textContent = 'Synced with server'; }
+  else if (source === 'local') { dot.className = 'sync-dot warn'; txt.textContent = 'Using local backup'; }
+  else { dot.className = 'sync-dot err'; txt.textContent = 'Offline'; }
+  if (tim) tim.textContent = time || '—';
+}
+
+async function syncSignals() {
+  const now = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}) + ' UTC';
+  const { data, source } = await fetchWithFallback(SIGNAL_ENDPOINT, 'signals');
+  setSyncStatus('sig-sync-dot', 'sig-sync-txt', 'sig-sync-time', source, now);
+  if (data && Array.isArray(data)) renderSignals(data);
+}
+
+async function syncConfluence() {
+  const now = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}) + ' UTC';
+  const { data, source } = await fetchWithFallback(IDX_ENDPOINT, 'idx_results');
+  setSyncStatus('conf-sync-dot', 'conf-sync-txt', 'conf-sync-time', source, now);
+  if (data) renderConfluence(data);
+}
+
+async function syncArticles() {
+  const now = new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'}) + ' UTC';
+  const { data, source } = await fetchWithFallback(ARTICLE_ENDPOINT, 'market_updates');
+  setSyncStatus('art-sync-dot', 'art-sync-txt', 'art-sync-time', source, now);
+  if (data) renderArticle(data);
+}
+
+async function syncUserProfile() {
+  if (!_currentUser) return;
+  const { data, source } = await fetchWithFallback(USER_ENDPOINT(_currentUser.uid), 'user_profile');
+  const now = new Date().toLocaleTimeString();
+  document.getElementById('last-sync-time').textContent = now;
+  document.getElementById('fb-status').textContent = source === 'firebase' ? 'Connected' : 'Offline';
+  document.getElementById('fb-status').className = 'status-badge' + (source === 'firebase' ? '' : ' err');
+  document.getElementById('json-status').textContent = 'Active';
+  if (data) {
+    _currentUser = {..._currentUser, ...data};
+    localSave('user', _currentUser);
+    renderProfile();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDERERS
+// ═══════════════════════════════════════════════════════
+function renderSignals(signals) {
+  // Render live signals from Firebase into the signals container
+  const c = document.getElementById('signals-container');
+  if (!signals || !signals.length) return;
+  c.innerHTML = signals.map(s => {
+    const isLong = s.direction === 'BUY';
+    const isConf = s.type === 'confluence';
+    const dirLabel = isLong ? 'LONG' : 'SHORT';
+    const spotPrefix = s.market_type === 'spot' ? 'SPOT ' : '';
+    return `<div class="sig">
+      <div class="sig-type">${s.signal_type || 'Order Flow'} · ${s.market_type === 'spot' ? 'Spot' : 'Futures'}</div>
+      <div class="sig-head">
+        <div><div class="sig-sym">${s.symbol}</div><div class="sig-meta">${s.asset_class || ''} · ${s.timeframe}</div></div>
+        <div class="dir ${isLong ? 'long' : 'short'}">${spotPrefix}${dirLabel}</div>
+      </div>
+      <div class="sig-div"></div>
+      <div class="sig-row"><span class="srl">Entry</span><span class="srv e">${s.entry_price} · ${s.order_type || 'Market'}</span></div>
+      ${!isConf ? `
+      <div class="sig-row"><span class="srl">Take Profit</span><span class="srv tp">${s.take_profit}</span></div>
+      <div class="sig-row"><span class="srl">Stop Loss</span><span class="srv sl">${s.stop_loss}</span></div>
+      <div class="sig-row"><span class="srl">R / R</span><span class="srv">${s.rr || '—'}</span></div>
+      ` : `
+      <div class="sig-row"><span class="srl">Index Votes</span><span class="srv" style="font-size:12px;">${s.idx_agree || 0} For · ${s.idx_disagree || 0} Against</span></div>
+      <div class="sig-row"><span class="srl">Strength</span><span class="srv" style="color:var(--gold);">${s.confluence_strength || '—'}</span></div>
+      `}
+      <div class="sig-time">Issued · ${s.timestamp || '—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderArticle(data) {
+  // Mirrors subscriber_card format from _build_template_article
+  if (!data) return;
+  const ts = document.getElementById('art-ts');
+  if (ts && data.timestamp) ts.textContent = data.timestamp;
+  // Cat bias rows updated dynamically if present
+}
+
+function renderProfile() {
+  if (!_currentUser) return;
+  const initials = (_currentUser.name || 'U').charAt(0).toUpperCase();
+  document.getElementById('pf-avatar').textContent = initials;
+  document.getElementById('pf-name').textContent = _currentUser.name || _currentUser.email || '—';
+  const planLabels = {
+    'bot1_bot4': 'Index + Articles',
+    'bot2': 'Signals',
+    'bot1_bot2_bot4': 'Full Premium',
+    'bot4': 'Articles Only',
+    'all': 'All Bots (Lifetime)',
+    '': 'Free'
+  };
+  const planKey = _currentUser.plan || '';
+  document.getElementById('pf-plan').textContent = (planLabels[planKey] || planKey || 'Free') + ' · ' + (_currentUser.role === 'vip' ? 'Active' : 'Pending');
+}
+
+function renderConfluence(data) {
+  // Update vote summary notice if data contains overall counts
+  if (data && data.overall) {
+    const el = document.getElementById('conf-vote-summary');
+    if (el) el.textContent = `Index votes: ${data.overall.bull || 0} confirming · ${data.overall.bear || 0} against · ${data.overall.neutral || 0} neutral`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  SETUP SAVE — pushes to Firebase + local backup
+// ═══════════════════════════════════════════════════════
+async function saveSetup() {
+  const tgUid    = document.getElementById('tg-uid').value.trim();
+  const tgChatId = document.getElementById('tg-chatid').value.trim();
+  const apiKey   = document.getElementById('api-key').value.trim();
+  const apiSec   = document.getElementById('api-secret').value.trim();
+  const st       = document.getElementById('setup-status');
+  if (!tgUid || !tgChatId) { st.textContent = 'Please enter your Telegram User ID and Chat ID.'; return; }
+  st.textContent = 'Saving...';
+  const payload = {
+    tg_uid: tgUid,
+    tg_chat_id: tgChatId,
+    api_key_hash: apiKey ? btoa(apiKey).slice(0,8) + '...' : '',
+    ct_market_type: _prefMarket,
+    updated_at: new Date().toISOString()
+  };
+  if (_currentUser) {
+    const ok = await pushToFirebase(USER_ENDPOINT(_currentUser.uid), payload);
+    st.textContent = ok ? 'Settings saved and synced.' : 'Saved locally. Will sync when online.';
+  } else {
+    localSave('setup', payload);
+    st.textContent = 'Saved locally.';
+  }
+}
+
+function setPref(type) {
+  _prefMarket = type;
+  document.getElementById('pref-spot').className    = 'btn ' + (type === 'spot'    ? 'btn-gold' : 'btn-ghost');
+  document.getElementById('pref-futures').className = 'btn ' + (type === 'futures' ? 'btn-gold' : 'btn-ghost');
+  // Reset flex style
+  ['pref-spot','pref-futures'].forEach(id => { document.getElementById(id).style.flex = '1'; document.getElementById(id).style.padding = '10px'; });
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome() {
+  const cached = localLoad('user');
+  if (cached) _currentUser = cached;
+  document.getElementById('bottom-nav').style.display = 'flex';
+  navigate('home');
+  renderProfile();
+  startSync();
+}
+function navigate(tab) {
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + tab);
+  if (el) el.classList.add('active');
+  // Setup tab uses profile nav slot
+  if (tab === 'setup') {
+    showScreen('screen-setup');
+    return;
+  }
+  showScreen('screen-' + tab);
+  if (tab === 'home')      syncSignals();
+  if (tab === 'confluence') syncConfluence();
+  if (tab === 'articles')   syncArticles();
+  if (tab === 'profile')    syncUserProfile();
+}
+function setSeg(btn, segId) {
+  document.getElementById(segId).querySelectorAll('.sb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function selEx(el) {
+  el.closest('.eg').querySelectorAll('.eb').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUTO SYNC — every 60 seconds for articles, 30s for signals
+// ═══════════════════════════════════════════════════════
+function startSync() {
+  if (_syncInterval) clearInterval(_syncInterval);
+  syncSignals(); syncConfluence(); syncArticles(); syncUserProfile();
+  _syncInterval = setInterval(() => {
+    const active = document.querySelector('.screen.active')?.id;
+    if (active === 'screen-home')       syncSignals();
+    if (active === 'screen-confluence') syncConfluence();
+    if (active === 'screen-articles')   syncArticles();
+    if (active === 'screen-profile')    syncUserProfile();
+  }, 30000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT — restore session from local backup
+// ═══════════════════════════════════════════════════════
+(function init() {
+  const cached = localLoad('user');
+  if (cached) {
+    _currentUser = cached;
     document.getElementById('bottom-nav').style.display = 'flex';
-    showScreen('screen-home');
-    updateNav('home');
+    navigate('home');
+    renderProfile();
+    startSync();
   }
-
-  function navigate(tab) {
-    updateNav(tab);
-    showScreen('screen-' + tab);
-  }
-
-  function updateNav(tab) {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const el = document.getElementById('nav-' + tab);
-    if (el) el.classList.add('active');
-  }
-
-  function switchAuth(mode, btn) {
-    document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('register-fields').style.display = mode === 'register' ? 'block' : 'none';
-    document.getElementById('auth-btn-label').textContent = mode === 'register' ? 'Create Account' : 'Continue';
-  }
-
-  function setSegment(btn) {
-    btn.closest('.segment').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  function selectExchange(el) {
-    el.closest('.exchange-grid').querySelectorAll('.exchange-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-
-  function handleToggle() {}
+})();
 </script>
 </body>
 </html>
