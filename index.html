@@ -377,87 +377,94 @@ h1{opacity:1 !important;}
 .ai-claude-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--grey);padding:2px 6px;border:1px solid var(--border);border-radius:2px;margin-left:4px;}
 </style>
 <style id="app-portal-css">
-/* ══ Portal overlay ══════════════════════════════════════════════════ */
+/* ══ PORTAL — full viewport takeover ══ */
 #app-portal {
   display: none;
   position: fixed;
-  inset: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   z-index: 9999;
   background: #09090b;
-  overflow: hidden;
-  align-items: stretch;
+  color: #e8e8ec;
+  font-family: 'DM Sans', sans-serif;
 }
-#app-portal.open { display: flex; flex-direction: column; color: #e8e8ec; font-family: 'DM Sans', sans-serif; }
+#app-portal.open { display: block; }
 
-/* The shell fills the portal completely */
+/* ══ SHELL — max-width centred column ══ */
 #app-portal .shell {
   width: 100%;
   max-width: 420px;
+  height: 100%;
   margin: 0 auto;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
   position: relative;
   overflow: hidden;
 }
 
-/* Screens: hidden by default, fill shell when active */
+/* ══ SCREENS — absolute fill, hidden by default ══ */
 #app-portal .screen {
   display: none;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  bottom: 66px;
+  overflow: hidden;
 }
 #app-portal .screen.active {
   display: flex;
-  animation: fadeIn .2s ease;
+  animation: fadeIn .18s ease;
 }
+/* auth screen needs full height — no nav below it */
+#app-portal #screen-auth {
+  bottom: 0 !important;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
 
-/* Scrollable content area within each screen */
+/* ══ SCROLL CONTENT — fills screen and scrolls ══ */
 #app-portal .scroll-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 80px;
-  min-height: 0;
+  height: 100%;
 }
 #app-portal .scroll-content::-webkit-scrollbar { display: none; }
 
-/* Bottom nav: absolute within the shell */
+/* ══ BOTTOM NAV — pinned to bottom of shell ══ */
 #app-portal .nav {
   display: none;
   position: absolute;
   bottom: 0; left: 0; right: 0;
+  height: 66px;
   background: #111114;
   border-top: 1px solid #232329;
-  z-index: 50;
+  z-index: 100;
+  flex-direction: row;
+  align-items: stretch;
 }
 #app-portal .nav.visible { display: flex; }
 #app-portal .nav-item {
   flex: 1; display: flex; flex-direction: column;
-  align-items: center; padding: 10px 4px 14px; gap: 3px;
+  align-items: center; justify-content: center;
+  padding: 8px 4px 12px; gap: 3px;
   cursor: pointer; color: #6b6b78; font-size: 10px; font-weight: 500;
   letter-spacing: .5px; text-transform: uppercase; border: none; background: none;
-  transition: color .15s;
+  transition: color .15s; -webkit-tap-highlight-color: transparent;
 }
 #app-portal .nav-item.active { color: #c9a84c; }
-#app-portal .nav-icon { width: 22px; height: 22px; stroke-width: 1.6; }
+#app-portal .nav-icon { width: 22px; height: 22px; stroke-width: 1.6; flex-shrink: 0; }
 
-/* Back button: inside portal, shown only after login */
+/* ══ BACK BUTTON — fixed viewport top-left ══ */
 #app-portal-back {
-  position: absolute;
+  position: fixed;
   top: 14px; left: 14px;
   z-index: 10001;
-  background: rgba(9,9,11,.92);
+  background: rgba(9,9,11,.95);
   border: 1px solid #232329;
   color: #c9a84c;
   font-family: 'DM Mono', monospace;
   font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
   padding: 7px 12px; cursor: pointer;
   display: none; align-items: center; gap: 5px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
   transition: border-color .2s;
 }
 #app-portal-back:hover { border-color: #c9a84c; }
@@ -480,10 +487,8 @@ h1{opacity:1 !important;}
     --radius:    16px;
     --radius-sm: 10px;
   }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  /* ── Screens ─────────────────────────── */
-  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  /* ── Utility reset (scoped to portal only) ─── */
+  #app-portal *, #app-portal *::before, #app-portal *::after { box-sizing: border-box; }
 
   /* ── Topbar ──────────────────────────── */
   #app-portal .topbar {
@@ -500,15 +505,7 @@ h1{opacity:1 !important;}
   #app-portal .live-dot::before { content: ''; width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-  /* ── Nav ─────────────────────────────── */
-  #app-portal .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    padding: 10px 4px 14px; gap: 3px; cursor: pointer;
-    color: var(--muted); font-size: 10px; font-weight: 500; letter-spacing: .5px;
-    text-transform: uppercase; border: none; background: none; transition: color .15s;
-  }
-  #app-portal .nav-item.active { color: var(--gold); }
-  #app-portal .nav-icon { width: 22px; height: 22px; stroke-width: 1.6; }
+  /* ── Nav styles defined in app-portal-css block above ─── */
 
   /* ── Cards ───────────────────────────── */
   #app-portal .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin: 0 16px 12px; }
@@ -624,7 +621,7 @@ h1{opacity:1 !important;}
   #app-portal .menu-chevron { color: var(--muted); }
 
   /* ── Auth ────────────────────────────── */
-  #app-portal .auth-hero { padding: 20px 20px 14px; text-align: center; }
+  #app-portal .auth-hero { padding: 48px 20px 20px; text-align: center; }
   #app-portal .auth-wordmark { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--gold); margin-bottom: 4px; white-space: nowrap; letter-spacing: -0.3px; }
   #app-portal .auth-tagline { font-size: 13px; color: var(--muted); }
   #app-portal .auth-form { padding: 0 20px; }
@@ -1409,7 +1406,6 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
   <div class="screen active" id="screen-auth">
     <div class="scroll-content">
       <div class="auth-hero">
-        <button onclick="closeAppPortal()" style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid #232329;color:#6b6b78;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:6px 11px;cursor:pointer;margin-bottom:16px;border-radius:4px;transition:border-color .2s;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#232329'">&#8592; Back to Site</button>
         <div class="auth-wordmark">30×Tech Research</div>
         <div class="auth-tagline">Institutional-grade signals for independent traders</div>
       </div>
@@ -2799,9 +2795,6 @@ function showScreen(id) {
   document.querySelectorAll('#app-portal .screen').forEach(s=>s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
-  // Show floating back btn only on post-auth screens
-  const backBtn = document.getElementById('app-portal-back');
-  if (backBtn) backBtn.classList.toggle('visible', id !== 'screen-auth');
 }
 function navigate(tab) { showScreen('screen-'+tab); updateNav(tab); }
 function updateNav(tab) {
@@ -2885,7 +2878,8 @@ function openAppPortal(){
   var hb=document.getElementById("hamburger");if(hb)hb.innerHTML="&#9776;";
   document.body.style.overflow="hidden";
   document.getElementById("app-portal").classList.add("open");
-  // back btn hidden on auth screen — shown only after login via showScreen()
+  // Always show back button so user can exit from any screen
+  var bb=document.getElementById("app-portal-back");if(bb)bb.classList.add("visible");
   history.pushState({appPortal:true},"",window.location.href);
 }
 function closeAppPortal(){
