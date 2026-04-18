@@ -377,13 +377,91 @@ h1{opacity:1 !important;}
 .ai-claude-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--grey);padding:2px 6px;border:1px solid var(--border);border-radius:2px;margin-left:4px;}
 </style>
 <style id="app-portal-css">
-#app-portal{display:none;position:fixed;inset:0;z-index:9999;background:#09090b;overflow:hidden;}
-#app-portal.open{display:block;}
-#app-portal-back{position:fixed;top:14px;left:14px;z-index:10001;background:rgba(9,9,11,.92);border:1px solid #232329;color:#c9a84c;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:8px 14px;cursor:pointer;display:none;align-items:center;gap:6px;backdrop-filter:blur(8px);transition:border-color .2s;}
-#app-portal-back:hover{border-color:#c9a84c;}
-#app-portal-back.visible{display:flex;}
+/* ══ Portal overlay ══════════════════════════════════════════════════ */
+#app-portal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #09090b;
+  overflow: hidden;
+}
+#app-portal.open { display: flex; flex-direction: column; }
+
+/* The shell fills the portal completely */
+#app-portal .shell {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Screens: hidden by default, fill shell when active */
+#app-portal .screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+#app-portal .screen.active {
+  display: flex;
+}
+
+/* Scrollable content area within each screen */
+#app-portal .scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 80px; /* space for nav */
+}
+#app-portal .scroll-content::-webkit-scrollbar { display: none; }
+
+/* Bottom nav: absolute within the shell */
+#app-portal .nav {
+  display: none;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: #111114;
+  border-top: 1px solid #232329;
+  z-index: 50;
+}
+#app-portal .nav.visible { display: flex; }
+#app-portal .nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; padding: 10px 4px 14px; gap: 3px;
+  cursor: pointer; color: #6b6b78; font-size: 10px; font-weight: 500;
+  letter-spacing: .5px; text-transform: uppercase; border: none; background: none;
+  transition: color .15s;
+}
+#app-portal .nav-item.active { color: #c9a84c; }
+#app-portal .nav-icon { width: 22px; height: 22px; stroke-width: 1.6; }
+
+/* Back button: inside the portal at top-left, above the shell */
+#app-portal-back {
+  position: absolute;
+  top: 14px; left: 14px;
+  z-index: 10001;
+  background: rgba(9,9,11,.92);
+  border: 1px solid #232329;
+  color: #c9a84c;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 7px 12px; cursor: pointer;
+  display: none; align-items: center; gap: 5px;
+  backdrop-filter: blur(8px);
+  transition: border-color .2s;
+}
+#app-portal-back:hover { border-color: #c9a84c; }
+#app-portal-back.visible { display: flex; }
 </style>
+
 <style>
+
 
   #app-portal {
     --bg:        #09090b;
@@ -402,11 +480,11 @@ h1{opacity:1 !important;}
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  #app-portal .shell { max-width: 420px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+
 
   /* ── Screens ─────────────────────────── */
-  #app-portal .screen { display: none; flex-direction: column; flex: 1; padding-bottom: 80px; animation: fadeIn .2s ease; }
-  #app-portal .screen.active { display: flex; }
+
+
   @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
 
   /* ── Topbar ──────────────────────────── */
@@ -425,12 +503,8 @@ h1{opacity:1 !important;}
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
   /* ── Nav ─────────────────────────────── */
-  #app-portal .nav {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 420px; background: var(--surface);
-    border-top: 1px solid var(--border); display: none; z-index: 100;
-  }
-  #app-portal .nav.visible { display: flex; }
+
+
   #app-portal .nav-item {
     flex: 1; display: flex; flex-direction: column; align-items: center;
     padding: 10px 4px 14px; gap: 3px; cursor: pointer;
@@ -583,7 +657,7 @@ h1{opacity:1 !important;}
   #app-portal .info-box strong { color: var(--blue); }
 
   /* ── Detail screens ──────────────────── */
-  #app-portal .detail-screen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; max-width: 420px; margin: 0 auto; }
+  #app-portal .detail-screen { display: none; position: absolute; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; max-width: 420px; margin: 0 auto; }
   #app-portal .detail-screen.open { display: block; }
   #app-portal .detail-topbar { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
   #app-portal .back-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: var(--card); border: 1px solid var(--border); border-radius: 50%; cursor: pointer; }
@@ -604,8 +678,8 @@ h1{opacity:1 !important;}
 
   /* ── Utility ─────────────────────────── */
   #app-portal .disclaimer { font-size: 10px; color: var(--muted); text-align: center; line-height: 1.6; padding: 8px 24px 16px; }
-  #app-portal .scroll-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  #app-portal .scroll-content::-webkit-scrollbar { display: none; }
+
+
   #app-portal .loading-wrap { display: flex; align-items: center; justify-content: center; padding: 32px; gap: 10px; color: var(--muted); font-size: 13px; }
   #app-portal .empty-state { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 13px; }
   #app-portal .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(201,168,76,.3); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; }
@@ -628,11 +702,11 @@ h1{opacity:1 !important;}
   #app-portal .tag-fx { background: rgba(155,89,182,.12); color: #9b59b6; }
   #app-portal .tag-metals { background: rgba(231,76,60,.12);  color: var(--red); }
 
+
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="logo"><em>30×</em>TECH RESEARCH</div>
   <div class="nav-links">
@@ -1332,14 +1406,15 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
 
 
 <!-- ═══ 30xTech App Portal ═══ -->
-<button id="app-portal-back" onclick="closeAppPortal()">&#8592; Back to Site</button>
-<div id="app-portal"><div style="width:100%;height:100vh;background:#09090b;color:#e8e8ec;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;">
-<div class="shell">
+<div id="app-portal">
+  <button id="app-portal-back" onclick="closeAppPortal()">&#8592; Back to Site</button>
+  <div class="shell">
 
   <!-- ══ AUTH ══════════════════════════════════════ -->
   <div class="screen active" id="screen-auth">
     <div class="scroll-content">
       <div class="auth-hero">
+        <button onclick="closeAppPortal()" style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid #232329;color:#6b6b78;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:6px 11px;cursor:pointer;margin-bottom:14px;border-radius:4px;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#232329'">&#8592; Site</button>
         <div class="auth-wordmark">30×Tech Research</div>
         <div class="auth-tagline">Institutional-grade signals for independent traders</div>
       </div>
@@ -2775,7 +2850,8 @@ function fmtTs(ts) {
 
 
 </script>
-</div></div>
+
+</div>
 <script>
 function openAppPortal(){
   if(window._initAuthOnOpen)window._initAuthOnOpen();
@@ -2783,13 +2859,11 @@ function openAppPortal(){
   var hb=document.getElementById("hamburger");if(hb)hb.innerHTML="&#9776;";
   document.body.style.overflow="hidden";
   document.getElementById("app-portal").classList.add("open");
-  document.getElementById("app-portal-back").classList.add("visible");
   history.pushState({appPortal:true},"",window.location.href);
 }
 function closeAppPortal(){
   document.body.style.overflow="";
   document.getElementById("app-portal").classList.remove("open");
-  document.getElementById("app-portal-back").classList.remove("visible");
   var nav=document.getElementById("bottom-nav");if(nav)nav.classList.remove("visible");
   document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
   var auth=document.getElementById("screen-auth");if(auth)auth.classList.add("active");
@@ -3189,6 +3263,7 @@ window.addEventListener("popstate",function(){
   el.addEventListener('mousemove',function(e){if(!isDown)return;e.preventDefault();var x=e.pageX-el.offsetLeft;el.scrollLeft=scrollLeft-(x-startX)*1.2;});
 })();
 </script>
+
 
 </body>
 </html>
