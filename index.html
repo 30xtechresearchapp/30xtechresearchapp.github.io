@@ -385,15 +385,17 @@ h1{opacity:1 !important;}
   z-index: 9999;
   background: #09090b;
   overflow: hidden;
+  align-items: stretch;
 }
-#app-portal.open { display: flex; flex-direction: column; }
+#app-portal.open { display: flex; flex-direction: column; color: #e8e8ec; font-family: 'DM Sans', sans-serif; }
 
 /* The shell fills the portal completely */
 #app-portal .shell {
   width: 100%;
   max-width: 420px;
   margin: 0 auto;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -406,18 +408,20 @@ h1{opacity:1 !important;}
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
 }
 #app-portal .screen.active {
   display: flex;
+  animation: fadeIn .2s ease;
 }
 
 /* Scrollable content area within each screen */
 #app-portal .scroll-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 80px; /* space for nav */
+  min-height: 0;
 }
 #app-portal .scroll-content::-webkit-scrollbar { display: none; }
 
@@ -491,7 +495,7 @@ h1{opacity:1 !important;}
   #app-portal .topbar {
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 20px 12px; position: sticky; top: 0; z-index: 10;
-    background: var(--bg); border-bottom: 1px solid var(--border);
+    background: #09090b; background: var(--bg); border-bottom: 1px solid #232329; border-bottom: 1px solid var(--border);
   }
   #app-portal .topbar-logo { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--gold); }
   #app-portal .topbar-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: -2px; }
@@ -515,7 +519,7 @@ h1{opacity:1 !important;}
   #app-portal .nav-icon { width: 22px; height: 22px; stroke-width: 1.6; }
 
   /* ── Cards ───────────────────────────── */
-  #app-portal .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin: 0 16px 12px; }
+  #app-portal .card { background: #16161a; background: var(--card); border: 1px solid #232329; border: 1px solid var(--border); border-radius: 16px; border-radius: var(--radius); padding: 18px; margin: 0 16px 12px; }
   #app-portal .card-sm { padding: 14px 16px; }
   #app-portal .card-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
 
