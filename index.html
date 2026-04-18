@@ -565,13 +565,18 @@ h1{opacity:1 !important;}
   #app-portal .price-val { font-weight: 600; font-family: monospace; }
 
   /* ── Index bars ──────────────────────── */
-  #app-portal .idx-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  #app-portal .idx-name { font-size: 12px; width: 110px; flex-shrink: 0; color: var(--muted); }
-  #app-portal .idx-bar-wrap { flex: 1; background: var(--surface); border-radius: 4px; height: 5px; }
+  #app-portal .idx-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  #app-portal .idx-name { font-size: 11px; width: 52px; flex-shrink: 0; color: var(--muted); font-weight: 500; }
+  #app-portal .idx-label { font-size: 10px; width: 72px; flex-shrink: 0; color: #3d3d46; line-height: 1.3; }
+  #app-portal .idx-bar-wrap { flex: 1; background: var(--surface); border-radius: 4px; height: 5px; min-width: 0; }
   #app-portal .idx-bar { height: 5px; border-radius: 4px; }
   #app-portal .idx-bar.bull { background: var(--green); }
-  #app-portal .idx-bar.bear { background: var(--red);   }
-  #app-portal .idx-val { font-size: 12px; font-weight: 600; width: 28px; text-align: right; }
+  #app-portal .idx-bar.bear { background: var(--red); }
+  #app-portal .idx-val { font-size: 12px; font-weight: 700; width: 26px; flex-shrink: 0; text-align: right; }
+  /* Legend */
+  #app-portal .idx-legend { display: flex; gap: 14px; padding: 10px 0 6px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+  #app-portal .idx-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: .5px; }
+  #app-portal .idx-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
   /* ── Plans ───────────────────────────── */
   #app-portal .plan-card { margin: 0 16px 12px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
@@ -2614,7 +2619,14 @@ async function loadMarketUpdates() {
       cats[idx.cat].push(idx);
     });
 
-    html += `<div class="section-head"><div class="section-title">Index Confluence</div><div class="section-sub">4H · 1D · 1W</div></div>`;
+    html += `<div class="section-head"><div class="section-title">Index Confluence</div><div class="section-sub">4H · 1D · 1W</div></div>
+      <div style="padding:0 16px 8px;">
+        <div class="idx-legend">
+          <div class="idx-legend-item"><div class="idx-legend-dot" style="background:var(--green);"></div>BULLISH &gt; 50</div>
+          <div class="idx-legend-item"><div class="idx-legend-dot" style="background:var(--red);"></div>BEARISH &lt; 50</div>
+          <div class="idx-legend-item"><div class="idx-legend-dot" style="background:#555;"></div>NEUTRAL = 50</div>
+        </div>
+      </div>`;
     Object.entries(cats).forEach(([cat, items]) => {
       html += `<div class="card" style="margin-bottom:10px;">
         <div class="card-label">${cat}</div>
@@ -2639,10 +2651,10 @@ async function loadMarketUpdates() {
 function idxRow(name, label, val, bull) {
   const c = bull ? 'var(--green)' : 'var(--red)';
   return `<div class="idx-row">
-    <div class="idx-name" style="width:90px;font-size:11px;">${name}</div>
-    <div style="flex:1;font-size:11px;color:var(--muted);padding-right:6px;">${label}</div>
-    <div class="idx-bar-wrap" style="width:80px;flex:none;"><div class="idx-bar ${bull?'bull':'bear'}" style="width:${val}%"></div></div>
-    <div class="idx-val" style="color:${c};width:28px;">${val}</div>
+    <div class="idx-name">${name}</div>
+    <div class="idx-label">${label}</div>
+    <div class="idx-bar-wrap"><div class="idx-bar ${bull?'bull':'bear'}" style="width:${val}%"></div></div>
+    <div class="idx-val" style="color:${c};">${val}</div>
   </div>`;
 }
 
