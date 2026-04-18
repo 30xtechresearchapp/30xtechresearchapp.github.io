@@ -412,19 +412,19 @@ h1{opacity:1 !important;}
   display: flex;
   animation: fadeIn .18s ease;
 }
-/* auth screen needs full height — no nav below it */
+/* auth screen fills full height — no nav */
 #app-portal #screen-auth {
   bottom: 0 !important;
 }
 @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
 
-/* ══ SCROLL CONTENT — fills screen and scrolls ══ */
+/* ══ SCROLL CONTENT — fills screen, scrolls internally ══ */
 #app-portal .scroll-content {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  height: 100%;
 }
 #app-portal .scroll-content::-webkit-scrollbar { display: none; }
 
@@ -452,23 +452,8 @@ h1{opacity:1 !important;}
 #app-portal .nav-item.active { color: #c9a84c; }
 #app-portal .nav-icon { width: 22px; height: 22px; stroke-width: 1.6; flex-shrink: 0; }
 
-/* ══ BACK BUTTON — fixed viewport top-left ══ */
-#app-portal-back {
-  position: fixed;
-  top: 14px; left: 14px;
-  z-index: 10001;
-  background: rgba(9,9,11,.95);
-  border: 1px solid #232329;
-  color: #c9a84c;
-  font-family: 'DM Mono', monospace;
-  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-  padding: 7px 12px; cursor: pointer;
-  display: none; align-items: center; gap: 5px;
-  backdrop-filter: blur(12px);
-  transition: border-color .2s;
-}
-#app-portal-back:hover { border-color: #c9a84c; }
-#app-portal-back.visible { display: flex; }
+/* ══ BACK BUTTON — hidden, replaced by inline topbar buttons ══ */
+#app-portal-back { display: none !important; }
 </style>
 <style>
 
@@ -620,8 +605,42 @@ h1{opacity:1 !important;}
   #app-portal .menu-icon { color: var(--muted); }
   #app-portal .menu-chevron { color: var(--muted); }
 
+  /* ── Auth topbar ────────────────────── */
+  #app-portal .auth-topbar {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px 0;
+    flex-shrink: 0;
+  }
+  #app-portal .auth-exit-btn {
+    background: none;
+    border: 1px solid #232329;
+    color: #6b6b78;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 7px 12px; cursor: pointer; border-radius: 4px;
+    transition: border-color .2s, color .2s;
+  }
+  #app-portal .auth-exit-btn:hover { border-color: #c9a84c; color: #c9a84c; }
+
+  /* ── Topbar exit button (× on logged-in screens) ── */
+  #app-portal .topbar-exit {
+    background: none;
+    border: none;
+    color: #6b6b78;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    margin-left: auto;
+    flex-shrink: 0;
+    transition: color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #app-portal .topbar-exit:hover { color: #e8e8ec; }
+
   /* ── Auth ────────────────────────────── */
-  #app-portal .auth-hero { padding: 48px 20px 20px; text-align: center; }
+  #app-portal .auth-hero { padding: 24px 20px 20px; text-align: center; }
   #app-portal .auth-wordmark { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--gold); margin-bottom: 4px; white-space: nowrap; letter-spacing: -0.3px; }
   #app-portal .auth-tagline { font-size: 13px; color: var(--muted); }
   #app-portal .auth-form { padding: 0 20px; }
@@ -1404,6 +1423,9 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
 
   <!-- ══ AUTH ══════════════════════════════════════ -->
   <div class="screen active" id="screen-auth">
+    <div class="auth-topbar">
+      <button class="auth-exit-btn" onclick="closeAppPortal()">&#8592; Back to Site</button>
+    </div>
     <div class="scroll-content">
       <div class="auth-hero">
         <div class="auth-wordmark">30×Tech Research</div>
@@ -1430,7 +1452,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
           </div>
           <div class="input-wrap mt-12">
             <label class="input-label">Telegram Chat ID</label>
-            <input class="input" type="number" id="si-tgid" placeholder="e.g. 7824293169" inputmode="numeric">
+            <input class="input" type="number" id="si-tgid" placeholder="e.g. 1234567890" inputmode="numeric">
           </div>
           <div class="input-wrap">
             <label class="input-label">Password</label>
@@ -1467,7 +1489,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
           </div>
           <div class="input-wrap mt-12">
             <label class="input-label">Telegram Chat ID</label>
-            <input class="input" type="number" id="reg-tgid" placeholder="e.g. 7824293169" inputmode="numeric">
+            <input class="input" type="number" id="reg-tgid" placeholder="e.g. 1234567890" inputmode="numeric">
           </div>
           <div class="input-wrap">
             <label class="input-label">Choose Password</label>
@@ -1507,7 +1529,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
           </div>
           <div class="input-wrap mt-12">
             <label class="input-label">Telegram Chat ID</label>
-            <input class="input" type="number" id="rec-tgid" placeholder="e.g. 7824293169" inputmode="numeric">
+            <input class="input" type="number" id="rec-tgid" placeholder="e.g. 1234567890" inputmode="numeric">
           </div>
           <button class="btn btn-gold mt-8" id="rec-btn" onclick="startRecover()"><span id="rec-btn-lbl">Send Recovery Code</span></button>
           <button class="btn btn-outline mt-8" onclick="setAuthMode('signin')" style="margin-top:8px;">Back to Sign In</button>
@@ -1522,6 +1544,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
     <div class="topbar">
       <div><div class="topbar-logo">30×Tech</div><div class="topbar-sub">Research Platform</div></div>
       <div class="live-dot">Live</div>
+      <button class="topbar-exit" onclick="closeAppPortal()" title="Back to site">&#10005;</button>
     </div>
     <div class="scroll-content">
       <div class="section-head">
@@ -1538,6 +1561,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
     <div class="topbar">
       <div><div class="topbar-logo">Market Updates</div><div class="topbar-sub">Live Price & Bias</div></div>
       <div class="live-dot">Live</div>
+      <button class="topbar-exit" onclick="closeAppPortal()" title="Back to site">&#10005;</button>
     </div>
     <div class="scroll-content">
       <div id="confluence-container"><div class="loading-wrap"><div class="spinner"></div> Loading…</div></div>
@@ -1550,6 +1574,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
     <div class="topbar">
       <div><div class="topbar-logo">Research</div><div class="topbar-sub">AI Market Analysis</div></div>
       <div class="live-dot">Updated hourly</div>
+      <button class="topbar-exit" onclick="closeAppPortal()" title="Back to site">&#10005;</button>
     </div>
     <div class="scroll-content">
       <div class="section-head">
@@ -1565,6 +1590,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
   <div class="screen" id="screen-plans">
     <div class="topbar">
       <div><div class="topbar-logo">Plans</div><div class="topbar-sub">Choose your access level</div></div>
+      <button class="topbar-exit" onclick="closeAppPortal()" title="Back to site">&#10005;</button>
     </div>
     <div class="scroll-content">
       <div class="section-head">
@@ -1781,6 +1807,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
   <div class="screen" id="screen-profile">
     <div class="topbar">
       <div><div class="topbar-logo">Account</div><div class="topbar-sub">Your profile</div></div>
+      <button class="topbar-exit" onclick="closeAppPortal()" title="Back to site">&#10005;</button>
     </div>
     <div class="scroll-content">
       <div style="padding:22px 16px 12px;text-align:center;">
@@ -2371,8 +2398,6 @@ function onLoginSuccess() {
 function doSignOut() {
   currentUser = null;
   document.getElementById('bottom-nav').classList.remove('visible');
-  var backBtn = document.getElementById('app-portal-back');
-  if (backBtn) backBtn.classList.remove('visible');
   ['si-tgid','si-pw','reg-tgid','reg-pw','reg-pw2','rec-tgid'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.value='';
   });
@@ -2878,15 +2903,11 @@ function openAppPortal(){
   var hb=document.getElementById("hamburger");if(hb)hb.innerHTML="&#9776;";
   document.body.style.overflow="hidden";
   document.getElementById("app-portal").classList.add("open");
-  // Always show back button so user can exit from any screen
-  var bb=document.getElementById("app-portal-back");if(bb)bb.classList.add("visible");
   history.pushState({appPortal:true},"",window.location.href);
 }
 function closeAppPortal(){
   document.body.style.overflow="";
   document.getElementById("app-portal").classList.remove("open");
-  var backBtn=document.getElementById("app-portal-back");
-  if(backBtn)backBtn.classList.remove("visible");
   var nav=document.getElementById("bottom-nav");if(nav)nav.classList.remove("visible");
   document.querySelectorAll("#app-portal .screen").forEach(function(s){s.classList.remove("active");});
   var auth=document.getElementById("screen-auth");if(auth)auth.classList.add("active");
