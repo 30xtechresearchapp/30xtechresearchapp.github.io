@@ -10,16 +10,30 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="30×Tech">
-<link rel="manifest" href="data:application/json,{
-  %22name%22:%2230%C3%97Tech Research%22,
-  %22short_name%22:%2230%C3%97Tech%22,
-  %22description%22:%22Institutional-grade trading signals %26 market data%22,
-  %22start_url%22:%22.%22,
-  %22display%22:%22standalone%22,
-  %22background_color%22:%22%2309090b%22,
-  %22theme_color%22:%22%2309090b%22,
-  %22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2309090b'/%3E%3Ctext y='.9em' font-size='80' font-family='serif' fill='%23c9a84c'%3E30%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22}]
-}">
+<link rel="manifest" id="pwa-manifest">
+<script>
+// Inject manifest as blob URL (works on GitHub Pages, no separate file needed)
+(function(){
+  const manifest = {
+    name: "30×Tech Research",
+    short_name: "30×Tech",
+    description: "Institutional-grade trading signals & market data",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#09090b",
+    theme_color: "#09090b",
+    icons: [{
+      src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%2309090b'/><text x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-size='280' font-family='Georgia,serif' fill='%23c9a84c'>30</text></svg>",
+      sizes: "512x512",
+      type: "image/svg+xml",
+      purpose: "any maskable"
+    }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const url  = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = url;
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap">
@@ -666,11 +680,18 @@ h1{opacity:1 !important;}
   #app-portal .status-pending { background: rgba(52,152,219,.1);  color: var(--blue);  }
 
   /* ── Market Update card ──────────────── */
-  #app-portal .update-card { margin: 0 16px 10px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
-  #app-portal .update-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  #app-portal .update-card { margin: 0 16px 10px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow: hidden; }
+  #app-portal .update-header { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 10px; }
   #app-portal .update-ts { font-size: 10px; color: var(--muted); }
-  #app-portal .bias-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; font-size: 13px; font-weight: 500; }
+  /* bias grid — 5 categories in clean rows */
+  #app-portal .art-bias-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  #app-portal .art-bias-row { display: flex; align-items: center; gap: 10px; }
   #app-portal .bias-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  #app-portal .art-bias-label { font-size: 12px; color: var(--muted); width: 64px; flex-shrink: 0; }
+  #app-portal .art-bias-val { font-size: 13px; font-weight: 700; letter-spacing: .5px; }
+  #app-portal .art-warn { font-size: 11px; color: var(--red); margin-top: 6px; padding: 6px 10px; background: rgba(231,76,60,.08); border-radius: 6px; }
+  /* legacy bias-row kept for any other usage */
+  #app-portal .bias-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; font-size: 13px; font-weight: 500; }
   #app-portal .bias-bull { background: var(--green); }
   #app-portal .bias-bear { background: var(--red); }
   #app-portal .bias-neut { background: var(--muted); }
@@ -1682,7 +1703,7 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
   <!-- ══ CONFLUENCE ════════════════════════════════ -->
   <div class="screen" id="screen-confluence">
     <div class="topbar">
-      <div><div class="topbar-logo">Market Updates</div><div class="topbar-sub">Live Price & Bias</div></div>
+      <div><div class="topbar-logo">Research</div><div class="topbar-sub">Index Confluence</div></div>
       <div class="live-dot">Live</div>
       <button class="topbar-exit" onclick="closeAppPortal()" title="Back to site">&#10005;</button>
     </div>
@@ -1695,15 +1716,15 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
   <!-- ══ RESEARCH ══════════════════════════════════ -->
   <div class="screen" id="screen-articles">
     <div class="topbar">
-      <div><div class="topbar-logo">Research</div><div class="topbar-sub">AI Market Analysis</div></div>
-      <div class="live-dot">Updated hourly</div>
+      <div><div class="topbar-logo">Updates</div><div class="topbar-sub">Market Intelligence</div></div>
+      <div class="live-dot">Live</div>
       <button class="topbar-exit" onclick="closeAppPortal()" title="Back to site">&#10005;</button>
     </div>
     <div class="scroll-content">
       <div class="section-head">
-        <div class="section-title">Latest Updates</div>
+        <div class="section-title">Market Updates</div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
-          <div class="section-sub">Every 60 min</div>
+          <div class="section-sub" id="articles-next-upd">Every 60 min</div>
           <div class="section-sub" id="articles-last-upd" style="font-size:9px;opacity:0.6;">—</div>
         </div>
       </div>
@@ -1992,11 +2013,11 @@ function switchPlan(plan,btn){document.querySelectorAll('.plan-panel').forEach(p
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Signals
     </button>
-    <button class="nav-item" onclick="navigate('confluence')">
+    <button class="nav-item" onclick="navigate('articles')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Updates
     </button>
-    <button class="nav-item" onclick="navigate('articles')">
+    <button class="nav-item" onclick="navigate('confluence')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Research
     </button>
@@ -2803,7 +2824,7 @@ async function loadSignals(silent = false) {
         <div class="signal-header">
           <div class="signal-header-left">
             <div class="signal-symbol">${s.symbol || '—'}</div>
-            <div class="signal-tf">${s.tf || '—'} · Tier ${s.tier || '?'}${s.ai_confirm ? ' · ✓ AI' : ''}</div>
+            <div class="signal-tf">${s.tf || '—'} · T${s.tier || '?'}</div>
           </div>
           <div class="signal-header-right">
             <div class="signal-dir ${dir === 'LONG' ? 'long' : 'short'}">${dir}</div>
@@ -3007,27 +3028,51 @@ async function loadArticles(silent = false) {
     _lastArtTs = latestTs;
 
     if (silent) flashUpdated('articles-container');
-    const artUpd = document.getElementById('articles-last-upd');
-    if (artUpd) artUpd.textContent = 'Refreshed ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const _now = new Date();
+    const artUpd  = document.getElementById('articles-last-upd');
+    const artNext = document.getElementById('articles-next-upd');
+    if (artUpd)  artUpd.textContent  = 'Updated ' + _now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    if (artNext) {
+      const _nextMs = new Date(_now.getTime() + POLL_ARTICLES);
+      artNext.textContent = 'Next: ' + _nextMs.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    }
 
     cont.innerHTML = items.map(a => {
       const ts  = a.ts ? fmtTs(a.ts) : 'Latest';
-      const cat = (a.category||a.tag||'Update').toUpperCase();
-      const tagClass = {
-        CRYPTO:'tag-crypto', MACRO:'tag-macro', STOCKS:'tag-stocks',
-        EQUITIES:'tag-stocks', FX:'tag-fx', METALS:'tag-metals'
-      }[cat] || 'tag-crypto';
 
-      return `<div class="update-card">
-        <div class="update-header"><span class="tag ${tagClass}">${cat}</span><div class="update-ts">${ts}</div></div>
-        ${a.bias_crypto||a.bias_stocks ? `<div style="margin-bottom:8px;">
-          ${a.bias_crypto ? `<div class="bias-row"><div class="bias-dot ${a.bias_crypto==='BULLISH'?'bias-bull':'bias-bear'}"></div>Crypto: <strong style="margin-left:4px;color:${a.bias_crypto==='BULLISH'?'var(--green)':'var(--red)'};">${a.bias_crypto}</strong></div>` : ''}
-          ${a.bias_stocks ? `<div class="bias-row"><div class="bias-dot ${a.bias_stocks==='BULLISH'?'bias-bull':'bias-bear'}"></div>Stocks: <strong style="margin-left:4px;color:${a.bias_stocks==='BULLISH'?'var(--green)':'var(--red)'};">${a.bias_stocks}</strong></div>` : ''}
-        </div>` : ''}
-        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">${a.title||a.headline||'Market Update'}</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6;">${a.body||a.excerpt||a.text||''}</div>
-        ${a.warn ? `<div style="font-size:11px;color:var(--red);margin-top:8px;">⚠ Watch: ${a.warn}</div>` : ''}
-        ${a.prices ? buildPriceList(a.prices) : ''}
+      // Build all 5 bias rows — show all available categories
+      const biasFields = [
+        { key: 'bias_crypto',  label: 'Crypto'    },
+        { key: 'bias_stocks',  label: 'Stocks'    },
+        { key: 'bias_fx',      label: 'FX'        },
+        { key: 'bias_metals',  label: 'Metals'    },
+        { key: 'bias_oil_gas', label: 'Oil & Gas' },
+      ];
+      const biasRows = biasFields
+        .filter(f => a[f.key] && a[f.key] !== 'NEUTRAL')
+        .map(f => {
+          const bull = a[f.key] === 'BULLISH';
+          const col  = bull ? 'var(--green)' : 'var(--red)';
+          const dot  = bull ? 'bias-bull' : 'bias-bear';
+          return `<div class="art-bias-row">
+            <div class="bias-dot ${dot}"></div>
+            <span class="art-bias-label">${f.label}</span>
+            <span class="art-bias-val" style="color:${col};">${a[f.key]}</span>
+          </div>`;
+        }).join('');
+
+      // Determine overall direction for accent colour
+      const hasBull = biasFields.some(f => a[f.key] === 'BULLISH');
+      const hasBear = biasFields.some(f => a[f.key] === 'BEARISH');
+      const accentCol = hasBear && !hasBull ? 'var(--red)' : hasBull ? 'var(--green)' : 'var(--gold)';
+
+      return `<div class="update-card" style="border-top:2px solid ${accentCol};">
+        <div class="update-header">
+          <div class="update-ts">${ts}</div>
+        </div>
+        ${biasRows ? `<div class="art-bias-grid">${biasRows}</div>` : ''}
+        ${a.warn ? `<div class="art-warn">⚠ ${a.warn}</div>` : ''}
+        ${a.prices && a.prices.length ? buildPriceList(a.prices) : ''}
       </div>`;
     }).join('');
 
@@ -3038,23 +3083,31 @@ async function loadArticles(silent = false) {
 
 function buildPriceList(prices) {
   if (!Array.isArray(prices)) return '';
-  return `<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
-    <div class="card-label" style="margin-bottom:6px;">LIVE PRICES</div>
-    ${prices.map(p => `<div class="price-row"><span class="price-sym">${p.label||p.sym||''}</span><span class="price-val">${p.price||p.px||''}</span></div>`).join('')}
+  // Strip emoji/special chars from labels (e.g. currency symbols injected by bot)
+  const cleanLbl = (s) => (s||'').replace(/[^\w\s\/\.\-\&]/g, '').trim();
+  return `<div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+    <div class="card-label" style="margin-bottom:8px;">LIVE PRICES</div>
+    ${prices.map(p => `<div class="price-row">
+      <span class="price-sym">${cleanLbl(p.label||p.sym||'')}</span>
+      <span class="price-val">${p.price||p.px||''}</span>
+    </div>`).join('')}
   </div>`;
 }
 
 function fallbackUpdates() {
-  return [
-    {cat:'CRYPTO',cls:'tag-crypto',title:'Bitcoin & Crypto Market Update',body:'Crypto indices trending with order flow bias confirmed. Watch key support/resistance on BTC/USDT and ETH/USDT. MFI readings suggest continued buyer momentum.'},
-    {cat:'MACRO', cls:'tag-macro', title:'DXY Weakness — Risk-On Rotation',body:'Dollar index continues softening from multi-month highs. Capital rotation toward higher-beta risk assets confirmed. Bullish bias on crypto and emerging market proxies.'},
-    {cat:'STOCKS',cls:'tag-stocks',title:'Equities — NASDAQ Holds Support',body:'NDX maintained its 20-week EMA for the third consecutive week. Options positioning suggests muted volatility expectations heading into earnings season.'},
-    {cat:'METALS',cls:'tag-metals',title:'Gold & Commodities Update',body:'XAUUSD cleared key resistance on strong volume. GLD ETF confirming bullish bias. Oil ETF (USO) and natural gas (UNG) watching for directional momentum.'},
-  ].map(a => `<div class="update-card">
-    <div class="update-header"><span class="tag ${a.cls}">${a.cat}</span><div class="update-ts">Cached · Verified Data</div></div>
-    <div style="font-size:13px;font-weight:600;margin-bottom:6px;">${a.title}</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.6;">${a.body}</div>
-  </div>`).join('');
+  return `<div class="update-card" style="border-top:2px solid var(--gold);">
+    <div class="update-header">
+      <div class="update-ts">Waiting for live data from bot...</div>
+    </div>
+    <div class="art-bias-grid">
+      <div class="art-bias-row"><div class="bias-dot" style="background:var(--muted);"></div><span class="art-bias-label">Crypto</span><span class="art-bias-val" style="color:var(--muted);">LOADING</span></div>
+      <div class="art-bias-row"><div class="bias-dot" style="background:var(--muted);"></div><span class="art-bias-label">Stocks</span><span class="art-bias-val" style="color:var(--muted);">LOADING</span></div>
+      <div class="art-bias-row"><div class="bias-dot" style="background:var(--muted);"></div><span class="art-bias-label">FX</span><span class="art-bias-val" style="color:var(--muted);">LOADING</span></div>
+      <div class="art-bias-row"><div class="bias-dot" style="background:var(--muted);"></div><span class="art-bias-label">Metals</span><span class="art-bias-val" style="color:var(--muted);">LOADING</span></div>
+      <div class="art-bias-row"><div class="bias-dot" style="background:var(--muted);"></div><span class="art-bias-label">Oil & Gas</span><span class="art-bias-val" style="color:var(--muted);">LOADING</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6;">Live market updates are delivered every 60 minutes by the bot. Check back shortly.</div>
+  </div>`;
 }
 
 // ═══════════════════════════════════════════════════
@@ -3189,7 +3242,7 @@ function navigate(tab) {
   if (tab === 'articles')   loadArticles(true);
 }
 function updateNav(tab) {
-  const tabs = ['home','confluence','articles','plans','profile'];
+  const tabs = ['home','articles','confluence','plans','profile'];
   document.querySelectorAll('#bottom-nav .nav-item').forEach((el,i)=>el.classList.toggle('active',tabs[i]===tab));
 }
 function openDetail(id) {
@@ -3704,30 +3757,56 @@ document.addEventListener('visibilitychange', function() {
   const installBtn = document.getElementById('pwa-install-btn');
   const closeBtn   = document.getElementById('pwa-close-btn');
 
-  // Don't show if already installed or dismissed
-  const dismissed = sessionStorage.getItem('pwa-dismissed');
-  if (dismissed) return;
+  // Already installed in standalone mode — hide everything
+  if (window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true) {
+    if (banner) banner.style.display = 'none';
+    return;
+  }
 
+  // Already dismissed this session
+  const dismissed = sessionStorage.getItem('pwa-dismissed');
+
+  // Catch the browser's native install prompt
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     _deferredPrompt = e;
-    // Show after 3s so it doesn't pop immediately on load
-    setTimeout(function() {
-      if (banner) banner.classList.add('show');
-    }, 3000);
+    if (!dismissed) {
+      setTimeout(function() {
+        if (banner) banner.classList.add('show');
+      }, 4000);
+    }
   });
 
+  // Install button clicked
   if (installBtn) {
     installBtn.addEventListener('click', async function() {
-      if (!_deferredPrompt) return;
-      banner.classList.remove('show');
-      _deferredPrompt.prompt();
-      const { outcome } = await _deferredPrompt.userChoice;
-      console.log('[PWA] Install outcome:', outcome);
-      _deferredPrompt = null;
+      if (_deferredPrompt) {
+        // Native install prompt available
+        banner.classList.remove('show');
+        _deferredPrompt.prompt();
+        const { outcome } = await _deferredPrompt.userChoice;
+        _deferredPrompt = null;
+      } else {
+        // Fallback — show instructions for iOS / unsupported browsers
+        banner.classList.remove('show');
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        if (isIOS) {
+          alert('To install:
+1. Tap the Share button (box with arrow)
+2. Scroll down and tap "Add to Home Screen"
+3. Tap "Add"');
+        } else {
+          alert('To install:
+1. Tap the menu (3 dots) in your browser
+2. Tap "Add to Home Screen" or "Install App"
+3. Tap "Install"');
+        }
+      }
     });
   }
 
+  // Dismiss button
   if (closeBtn) {
     closeBtn.addEventListener('click', function() {
       banner.classList.remove('show');
@@ -3735,9 +3814,14 @@ document.addEventListener('visibilitychange', function() {
     });
   }
 
-  // Hide banner if app is already installed (standalone mode)
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    if (banner) banner.style.display = 'none';
+  // Fallback: show banner after 6s regardless of beforeinstallprompt
+  // (covers iOS Safari which never fires beforeinstallprompt)
+  if (!dismissed) {
+    setTimeout(function() {
+      if (banner && !banner.classList.contains('show')) {
+        banner.classList.add('show');
+      }
+    }, 6000);
   }
 })();
 
